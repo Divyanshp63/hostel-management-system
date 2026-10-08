@@ -25,7 +25,7 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<RoomResponse>> createRoom(
             @Valid @RequestBody CreateRoomRequest request
     ) {
@@ -37,7 +37,7 @@ public class RoomController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<ApiResponse<PageResponse<RoomResponse>>> getAllRooms(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -54,28 +54,28 @@ public class RoomController {
     }
 
     @GetMapping("/available")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<ApiResponse<List<RoomResponse>>> getAvailableRooms() {
         List<RoomResponse> response = roomService.getAvailableRooms();
         return ResponseEntity.ok(ApiResponse.success("Available rooms retrieved successfully", response));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<ApiResponse<RoomResponse>> getRoomById(@PathVariable Long id) {
         RoomResponse response = roomService.getRoomById(id);
         return ResponseEntity.ok(ApiResponse.success("Room details retrieved successfully", response));
     }
 
     @GetMapping("/number/{roomNumber}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<ApiResponse<RoomResponse>> getRoomByNumber(@PathVariable String roomNumber) {
         RoomResponse response = roomService.getRoomByNumber(roomNumber);
         return ResponseEntity.ok(ApiResponse.success("Room details retrieved successfully", response));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<RoomResponse>> updateRoom(
             @PathVariable Long id,
             @Valid @RequestBody UpdateRoomRequest request
@@ -85,7 +85,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<String>> deleteRoom(@PathVariable Long id) {
         roomService.deleteRoom(id);
         return ResponseEntity.ok(ApiResponse.success("Room deleted successfully", null));

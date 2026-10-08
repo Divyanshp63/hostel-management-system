@@ -25,10 +25,20 @@
     </properties>
 
     <dependencies>
-        <!-- 1. Spring Web for REST APIs -->
+        <!-- 1. Spring Web for MVC & REST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Thymeleaf Template Engine for Server-Side Rendering -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
         </dependency>
 
         <!-- 2. Spring Data JPA for Hibernate ORM & Repositories -->

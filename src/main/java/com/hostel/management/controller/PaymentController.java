@@ -26,7 +26,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<PaymentResponse>> processPayment(
             @Valid @RequestBody PaymentRequest request,
             @AuthenticationPrincipal UserDetails userDetails
@@ -39,7 +39,7 @@ public class PaymentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<PageResponse<PaymentResponse>>> getAllPayments(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -65,7 +65,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<ApiResponse<PaymentResponse>> getPaymentById(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
@@ -75,7 +75,7 @@ public class PaymentController {
     }
 
     @GetMapping("/transaction/{transactionId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<ApiResponse<PaymentResponse>> getPaymentByTransactionId(
             @PathVariable String transactionId,
             @AuthenticationPrincipal UserDetails userDetails
@@ -85,7 +85,7 @@ public class PaymentController {
     }
 
     @GetMapping("/fee/{feeId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<ApiResponse<List<PaymentResponse>>> getPaymentsByFeeId(
             @PathVariable Long feeId,
             @AuthenticationPrincipal UserDetails userDetails

@@ -23,7 +23,7 @@ public class MessMenuController {
     private final MessMenuService messMenuService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<MessMenuResponse>> createMenu(
             @Valid @RequestBody MessMenuRequest request) {
         MessMenuResponse response = messMenuService.createMenu(request);
@@ -34,7 +34,7 @@ public class MessMenuController {
     }
 
     @PostMapping("/upsert")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<MessMenuResponse>> createOrUpdateMenu(
             @Valid @RequestBody MessMenuRequest request) {
         MessMenuResponse response = messMenuService.createOrUpdateMenu(request);
@@ -44,7 +44,7 @@ public class MessMenuController {
     }
 
     @PostMapping("/bulk")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<List<MessMenuResponse>>> bulkSaveMenu(
             @Valid @RequestBody List<MessMenuRequest> requests) {
         List<MessMenuResponse> responses = messMenuService.bulkSaveMenu(requests);
@@ -54,7 +54,7 @@ public class MessMenuController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<MessMenuResponse>> updateMenu(
             @PathVariable Long id,
             @Valid @RequestBody MessMenuRequest request) {
@@ -65,7 +65,7 @@ public class MessMenuController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<Void>> deleteMenu(@PathVariable Long id) {
         messMenuService.deleteMenu(id);
         return ResponseEntity.ok(
@@ -74,7 +74,7 @@ public class MessMenuController {
     }
 
     @GetMapping("/today")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<List<MessMenuResponse>>> getTodayMenu() {
         List<MessMenuResponse> response = messMenuService.getTodayMenu();
         return ResponseEntity.ok(
@@ -83,7 +83,7 @@ public class MessMenuController {
     }
 
     @GetMapping("/day/{dayOfWeek}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<List<MessMenuResponse>>> getMenuForDay(
             @PathVariable DayOfWeek dayOfWeek) {
         List<MessMenuResponse> response = messMenuService.getMenuForDay(dayOfWeek);
@@ -93,7 +93,7 @@ public class MessMenuController {
     }
 
     @GetMapping("/weekly")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<WeeklyMenuResponse>> getWeeklyMenu() {
         WeeklyMenuResponse response = messMenuService.getWeeklyMenu();
         return ResponseEntity.ok(
@@ -102,7 +102,7 @@ public class MessMenuController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<MessMenuResponse>> getMenuById(@PathVariable Long id) {
         MessMenuResponse response = messMenuService.getMenuById(id);
         return ResponseEntity.ok(
@@ -111,7 +111,7 @@ public class MessMenuController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<List<MessMenuResponse>>> getAllMenus() {
         List<MessMenuResponse> response = messMenuService.getAllMenus();
         return ResponseEntity.ok(

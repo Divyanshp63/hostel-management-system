@@ -36,6 +36,9 @@ public class VisitorRequest {
     @Column(name = "visit_date", nullable = false)
     private LocalDate visitDate;
 
+    @Column(name = "visit_time", length = 30)
+    private String visitTime;
+
     @Column(name = "check_in_time")
     private LocalDateTime checkInTime;
 
@@ -56,6 +59,13 @@ public class VisitorRequest {
     @Column(nullable = false, length = 255)
     private String purpose;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approved_by_id")
+    private User approvedBy;
+
+    @Column(name = "approved_or_rejected_at")
+    private LocalDateTime approvedOrRejectedAt;
+
     @Column(name = "admin_remarks", length = 255)
     private String adminRemarks;
 
@@ -63,6 +73,14 @@ public class VisitorRequest {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    public String getWardenRemarks() {
+        return this.adminRemarks;
+    }
+
+    public void setWardenRemarks(String remarks) {
+        this.adminRemarks = remarks;
+    }
 
     @PrePersist
     protected void onCreate() {

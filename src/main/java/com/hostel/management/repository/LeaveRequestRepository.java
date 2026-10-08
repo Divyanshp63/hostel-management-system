@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -22,6 +23,13 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     long countByStatus(LeaveStatus status);
 
     long countByStudentIdAndStatus(Long studentId, LeaveStatus status);
+
+    @Query("SELECT COUNT(l) FROM LeaveRequest l WHERE l.student.id = :studentId " +
+            "AND l.status IN ('PENDING', 'APPROVED') " +
+            "AND l.fromDate <= :toDate AND l.toDate >= :fromDate")
+    long countOverlappingActiveLeaves(@Param("studentId") Long studentId,
+                                      @Param("fromDate") LocalDate fromDate,
+                                      @Param("toDate") LocalDate toDate);
 
     @Query("SELECT l FROM LeaveRequest l JOIN l.student s JOIN s.user u WHERE " +
             "(:search IS NULL OR :search = '' OR " +

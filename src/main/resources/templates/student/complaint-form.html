@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('Lodge Complaint')}">
+    <title>Lodge Complaint - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('complaints')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Lodge Maintenance Complaint</h3>
+                <p class="text-muted small mb-0">
+                    Assigned Room: <span class="fw-bold text-primary" th:text="${currentRoom}">Room A-101</span> &bull;
+                    <span class="badge bg-primary-subtle text-primary"><i class="bi bi-tools me-1"></i>Direct Maintenance Department Routing</span>
+                </p>
+            </div>
+            <a th:href="@{/student/complaints}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to Complaints
+            </a>
+        </div>
+
+        <div class="card card-custom">
+            <div class="card-body p-4 p-md-5">
+                <form th:action="@{/student/complaints/save}" th:object="${complaint}" method="post">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="category" class="form-label">Issue Category <span class="text-danger">*</span></label>
+                            <select class="form-select" th:field="*{category}" id="category" th:classappend="${#fields.hasErrors('category')} ? 'is-invalid' : ''">
+                                <option value="">-- Select Category --</option>
+                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.displayName}">ELECTRICAL</option>
+                            </select>
+                            <div class="invalid-feedback" th:errors="*{category}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="priority" class="form-label">Priority Level <span class="text-danger">*</span></label>
+                            <select class="form-select" th:field="*{priority}" id="priority">
+                                <option th:each="p : ${priorities}" th:value="${p}" th:text="${p + ' (' + p.slaHours + ' Hours SLA)'}">MEDIUM (24 Hours SLA)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="title" class="form-label">Brief Issue Headline <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{title}" id="title" placeholder="e.g. Washroom sink tap leaking continuously" th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{title}"></div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="description" class="form-label">Detailed Description of the Issue <span class="text-danger">*</span></label>
+                            <textarea class="form-control" th:field="*{description}" id="description" rows="4" placeholder="Please describe exactly what is broken or malfunctioning and how urgent it is..." th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"></textarea>
+                            <div class="invalid-feedback" th:errors="*{description}"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a th:href="@{/student/complaints}" class="btn btn-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-send-fill me-1"></i> Submit Complaint Ticket
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

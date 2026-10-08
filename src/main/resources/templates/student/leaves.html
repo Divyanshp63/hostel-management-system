@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('Leave Passes')}">
+    <title>Leave Passes - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('leaves')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Out-of-Campus Leave Passes</h3>
+                <p class="text-muted small mb-0">Apply for home visits, medical leaves, or academic off-campus permissions</p>
+            </div>
+            <a th:href="@{/student/leaves/new}" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                <i class="bi bi-calendar-plus me-1"></i> Apply for Leave Pass
+            </a>
+        </div>
+
+        <!-- Leaves Table Card -->
+        <div class="card card-custom">
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>Leave Type</th>
+                        <th>From Date</th>
+                        <th>To Date</th>
+                        <th>Reason &amp; Destination</th>
+                        <th>Emergency Contact</th>
+                        <th>Status</th>
+                        <th>Warden Remarks</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="l : ${leaves}">
+                        <td>
+                            <span class="badge bg-primary-subtle text-primary fw-bold" th:text="${l.leaveType}">HOME_VISIT</span>
+                        </td>
+                        <td class="fw-semibold text-dark" th:text="${l.fromDate}">2026-10-20</td>
+                        <td class="fw-semibold text-dark" th:text="${l.toDate}">2026-10-25</td>
+                        <td>
+                            <div class="fw-medium text-dark" th:text="${l.reason}">Diwali Vacation</div>
+                            <div class="text-muted small" th:if="${l.destinationAddress != null}">
+                                <i class="bi bi-geo-alt me-1"></i><span th:text="${l.destinationAddress}">Jaipur</span>
+                            </div>
+                        </td>
+                        <td th:text="${l.emergencyContactPhone}">9876543210</td>
+                        <td>
+                            <span class="badge badge-status"
+                                  th:classappend="${l.status.name() == 'APPROVED' ? 'status-approved' : (l.status.name() == 'PENDING' ? 'status-pending' : (l.status.name() == 'CANCELLED' ? 'status-cancelled' : 'status-rejected'))}"
+                                  th:text="${l.status}">
+                                PENDING
+                            </span>
+                        </td>
+                        <td>
+                            <span th:if="${l.adminRemarks != null}" class="text-success small fw-medium" th:text="${l.adminRemarks}">Approved</span>
+                            <span th:if="${l.adminRemarks == null}" class="text-muted small">Awaiting review</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(leaves)}">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-check fs-1 text-secondary d-block mb-2"></i>
+                            <div class="mb-3">No leave requests found.</div>
+                            <a th:href="@{/student/leaves/new}" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                                <i class="bi bi-calendar-plus me-1"></i> Apply for Leave Pass
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

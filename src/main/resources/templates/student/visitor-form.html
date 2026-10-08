@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('Register Visitor')}">
+    <title>Register Visitor - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('visitors')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Pre-Register Guest / Visitor</h3>
+                <p class="text-muted small mb-0">Submit visitor gate entry pass request to security</p>
+            </div>
+            <a th:href="@{/student/visitors}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to Visitors
+            </a>
+        </div>
+
+        <div class="card card-custom">
+            <div class="card-body p-4 p-md-5">
+                <form th:action="@{/student/visitors/save}" th:object="${visitor}" method="post">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="visitorName" class="form-label">Visitor Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{visitorName}" id="visitorName" placeholder="Full name of guest" th:classappend="${#fields.hasErrors('visitorName')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{visitorName}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="relation" class="form-label">Relation to Resident Student <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{relation}" id="relation" placeholder="e.g. Father, Mother, Brother, Guardian" th:classappend="${#fields.hasErrors('relation')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{relation}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="visitorPhone" class="form-label">Visitor Contact Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{visitorPhone}" id="visitorPhone" placeholder="10-digit number" maxlength="10" th:classappend="${#fields.hasErrors('visitorPhone')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{visitorPhone}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="visitDate" class="form-label">Expected Date of Visit <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" th:field="*{visitDate}" id="visitDate" th:classappend="${#fields.hasErrors('visitDate')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{visitDate}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="visitTime" class="form-label">Expected Time of Visit</label>
+                            <input type="time" class="form-control" th:field="*{visitTime}" id="visitTime">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="purpose" class="form-label">Purpose of Campus Visit <span class="text-danger">*</span></label>
+                            <textarea class="form-control" th:field="*{purpose}" id="purpose" rows="3" placeholder="Briefly state the purpose of visiting (e.g. Meeting, dropping off luggage, semester fee submission)" th:classappend="${#fields.hasErrors('purpose')} ? 'is-invalid' : ''"></textarea>
+                            <div class="invalid-feedback" th:errors="*{purpose}"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a th:href="@{/student/visitors}" class="btn btn-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-person-check-fill me-1"></i> Submit Visitor Pass
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

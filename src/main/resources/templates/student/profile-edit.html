@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('Edit Profile')}">
+    <title>Edit Profile - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('profile')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Update Personal Profile</h3>
+                <p class="text-muted small mb-0">Admission: <span class="fw-bold text-dark" th:text="${admissionNumber}">ADM-001</span> &bull; Email: <span th:text="${email}">email@hostel.com</span></p>
+            </div>
+            <a th:href="@{/student/profile}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to Profile
+            </a>
+        </div>
+
+        <div class="card card-custom">
+            <div class="card-body p-4 p-md-5">
+                <form th:action="@{/student/profile/update}" th:object="${student}" method="post">
+                    <h5 class="fw-bold text-primary mb-3 border-bottom pb-2">
+                        <i class="bi bi-person me-2"></i> Personal Details
+                    </h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{name}" id="name" th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{name}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Mobile Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{phone}" id="phone" maxlength="10" th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{phone}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="course" class="form-label">Course / Degree <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{course}" id="course" th:classappend="${#fields.hasErrors('course')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{course}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="yearOfStudy" class="form-label">Year of Study <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{yearOfStudy}" id="yearOfStudy" th:classappend="${#fields.hasErrors('yearOfStudy')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{yearOfStudy}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                            <select class="form-select" th:field="*{gender}" id="gender">
+                                <option th:each="g : ${genders}" th:value="${g}" th:text="${g}">MALE</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" th:field="*{dateOfBirth}" id="dateOfBirth">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="bloodGroup" class="form-label">Blood Group</label>
+                            <input type="text" class="form-control" th:field="*{bloodGroup}" id="bloodGroup" placeholder="e.g. O+, B+">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="address" class="form-label">Permanent Home Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" th:field="*{address}" id="address" rows="2" th:classappend="${#fields.hasErrors('address')} ? 'is-invalid' : ''"></textarea>
+                            <div class="invalid-feedback" th:errors="*{address}"></div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-primary mb-3 border-bottom pb-2">
+                        <i class="bi bi-shield-check me-2"></i> Guardian &amp; Emergency Contact
+                    </h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="guardianName" class="form-label">Guardian Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{guardianName}" id="guardianName" th:classappend="${#fields.hasErrors('guardianName')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{guardianName}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="guardianPhone" class="form-label">Guardian Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{guardianPhone}" id="guardianPhone" maxlength="10" th:classappend="${#fields.hasErrors('guardianPhone')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{guardianPhone}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="emergencyContact" class="form-label">Emergency Phone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{emergencyContact}" id="emergencyContact" maxlength="10" th:classappend="${#fields.hasErrors('emergencyContact')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{emergencyContact}"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a th:href="@{/student/profile}" class="btn btn-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-save me-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

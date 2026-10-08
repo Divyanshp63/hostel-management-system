@@ -18,17 +18,17 @@ public class ReportController {
     private final PdfReportService pdfReportService;
 
     @GetMapping("/fee-receipt/{paymentId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<byte[]> downloadFeeReceipt(
             @PathVariable Long paymentId,
             Authentication authentication) {
 
         String currentUserEmail = authentication.getName();
-        boolean isAdminOrAccountant = authentication.getAuthorities().stream()
+        boolean isWardenOrAccountant = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(role -> role.equals("ROLE_ADMIN") || role.equals("ROLE_ACCOUNTANT"));
+                .anyMatch(role -> role.equals("ROLE_WARDEN") || role.equals("ROLE_ACCOUNTANT"));
 
-        byte[] pdfBytes = pdfReportService.generateFeeReceiptPdf(paymentId, currentUserEmail, isAdminOrAccountant);
+        byte[] pdfBytes = pdfReportService.generateFeeReceiptPdf(paymentId, currentUserEmail, isWardenOrAccountant);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
@@ -41,7 +41,7 @@ public class ReportController {
     }
 
     @GetMapping("/financial/monthly")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<byte[]> downloadMonthlyFinancialReport(
             @RequestParam String month) {
 
@@ -58,7 +58,7 @@ public class ReportController {
     }
 
     @GetMapping("/occupancy")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<byte[]> downloadOccupancyReport() {
 
         byte[] pdfBytes = pdfReportService.generateOccupancyReportPdf();

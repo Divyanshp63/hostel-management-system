@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,9 +61,12 @@ public class DashboardServiceImpl implements DashboardService {
         long overdueFeeCount = feeRepository.countByStatus(FeeStatus.OVERDUE);
 
         // 4. Operations & Welfare Stats
-        long pendingComplaints = complaintRepository.countByStatus(ComplaintStatus.PENDING);
+        long pendingVerificationCount = complaintRepository.countByStatus(ComplaintStatus.RESOLVED_BY_MAINTENANCE);
         long inProgressComplaints = complaintRepository.countByStatus(ComplaintStatus.IN_PROGRESS);
-        long resolvedComplaints = complaintRepository.countByStatus(ComplaintStatus.RESOLVED);
+        long verifiedCount = complaintRepository.countByStatusIn(List.of(ComplaintStatus.VERIFIED, ComplaintStatus.CLOSED));
+        long returnedComplaints = complaintRepository.countByStatus(ComplaintStatus.RETURNED);
+        long totalComplaints = complaintRepository.count();
+        long escalatedComplaints = complaintRepository.countSlaBreachedTotal(LocalDateTime.now());
         long pendingLeaves = leaveRequestRepository.countByStatus(LeaveStatus.PENDING);
         long activeVisitorsToday = visitorRequestRepository.countByVisitDate(LocalDate.now());
         long activeNoticesCount = noticeRepository.countByActiveTrue();
@@ -155,9 +159,14 @@ public class DashboardServiceImpl implements DashboardService {
                 .totalFeeCollected(totalFeeCollected)
                 .totalFeePending(totalFeePending)
                 .overdueFeeCount(overdueFeeCount)
-                .pendingComplaints(pendingComplaints)
+                .pendingComplaints(pendingVerificationCount)
+                .pendingVerificationCount(pendingVerificationCount)
                 .inProgressComplaints(inProgressComplaints)
-                .resolvedComplaints(resolvedComplaints)
+                .resolvedComplaints(verifiedCount)
+                .verifiedCount(verifiedCount)
+                .returnedCount(returnedComplaints)
+                .totalComplaints(totalComplaints)
+                .escalatedComplaints(escalatedComplaints)
                 .pendingLeaves(pendingLeaves)
                 .activeVisitorsToday(activeVisitorsToday)
                 .activeNoticesCount(activeNoticesCount)
@@ -242,7 +251,14 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         // 4. Welfare & Request Counts
-        long myPendingComplaints = complaintRepository.countByStudentIdAndStatus(studentId, ComplaintStatus.PENDING);
+        // 4. Welfare & Request Counts (All dynamic from MySQL)
+        long myComplaintsCount = complaintRepository.countByStudentId(studentId);
+        long openComplaintsCount = complaintRepository.countByStudentIdAndStatus(studentId, ComplaintStatus.SUBMITTED);
+        long inProgressComplaintsCount = complaintRepository.countByStudentIdAndStatusIn(studentId, List.of(ComplaintStatus.IN_PROGRESS, ComplaintStatus.RETURNED));
+        long resolvedComplaintsCount = complaintRepository.countByStudentIdAndStatus(studentId, ComplaintStatus.RESOLVED_BY_MAINTENANCE);
+        long closedComplaintsCount = complaintRepository.countByStudentIdAndStatusIn(studentId, List.of(ComplaintStatus.CLOSED, ComplaintStatus.VERIFIED));
+        long myPendingComplaints = openComplaintsCount + inProgressComplaintsCount + resolvedComplaintsCount;
+
         String latestComplaintStatus = "NONE";
         Optional<Complaint> lastComplaint = complaintRepository.findFirstByStudentIdOrderByCreatedAtDesc(studentId);
         if (lastComplaint.isPresent()) {
@@ -284,6 +300,11 @@ public class DashboardServiceImpl implements DashboardService {
                 .todaySnacks(todaySnacks)
                 .todayDinner(todayDinner)
                 .myPendingComplaints(myPendingComplaints)
+                .myComplaintsCount(myComplaintsCount)
+                .openComplaintsCount(openComplaintsCount)
+                .inProgressComplaintsCount(inProgressComplaintsCount)
+                .resolvedComplaintsCount(resolvedComplaintsCount)
+                .closedComplaintsCount(closedComplaintsCount)
                 .latestComplaintStatus(latestComplaintStatus)
                 .myPendingLeaves(myPendingLeaves)
                 .myPendingVisitors(myPendingVisitors)

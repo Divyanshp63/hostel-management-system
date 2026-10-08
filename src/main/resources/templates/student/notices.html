@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('Hostel Notices')}">
+    <title>Notices - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('notices')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Official Notices &amp; Bulletins</h3>
+                <p class="text-muted small mb-0">Important official hostel broadcasts, timings, rules, and announcements</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div th:each="n : ${notices}" class="col-md-6 col-xl-4">
+                <div class="card card-custom h-100">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <span class="badge"
+                              th:classappend="${n.priority.name() == 'HIGH' ? 'bg-danger' : (n.priority.name() == 'MEDIUM' ? 'bg-warning text-dark' : 'bg-primary')}"
+                              th:text="${n.priority}">HIGH</span>
+                        <span class="small text-muted" th:text="${#temporals.format(n.createdAt, 'dd-MMM-yyyy')}">05-Oct-2026</span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold text-dark mb-2" th:text="${n.title}">Notice Headline</h5>
+                        <p class="text-muted small mb-0" th:text="${n.content}">Notice full description content</p>
+                    </div>
+                    <div class="card-footer bg-light border-0 py-2 px-3 small text-muted d-flex justify-content-between">
+                        <span>Audience: <strong class="text-dark" th:text="${n.targetAudience}">ALL</strong></span>
+                        <span th:if="${n.expiryDate != null}">Valid until: <span th:text="${n.expiryDate}">-</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(notices)}" class="col-12 text-center py-5 text-muted">
+                <i class="bi bi-bell-slash fs-1 text-secondary d-block mb-2"></i>
+                No active announcements at this time.
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

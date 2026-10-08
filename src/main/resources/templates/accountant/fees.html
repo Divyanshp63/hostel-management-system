@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Manage Student Fees')}"></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/sidebar :: sidebar('fees')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h3 class="fw-bold mb-1">Student Fee Management</h3>
+                <p class="text-muted mb-0">Track student fee invoices, dues, breakdowns, and payments.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/accountant/fees/pending}" class="btn btn-outline-warning">
+                    <i class="bi bi-clock-history me-1"></i> Pending Invoices
+                </a>
+                <a th:href="@{/accountant/fees/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Generate Invoice
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <form th:action="@{/accountant/fees}" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Search Student</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" name="search" th:value="${search}" class="form-control" placeholder="Name or admission number...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Fee Status</label>
+                        <select name="status" class="form-select">
+                            <option value="">All Statuses</option>
+                            <option th:each="st : ${statuses}"
+                                    th:value="${st}"
+                                    th:text="${st}"
+                                    th:selected="${st == selectedStatus}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Billing Month</label>
+                        <input type="month" name="month" th:value="${selectedMonth}" class="form-control">
+                    </div>
+                    <div class="col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                        <a th:href="@{/accountant/fees}" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Fees Table -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#ID</th>
+                                <th>Student</th>
+                                <th>Month</th>
+                                <th>Itemized Breakdown</th>
+                                <th>Total</th>
+                                <th>Paid</th>
+                                <th>Pending</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="f : ${fees}">
+                                <td class="fw-semibold text-muted" th:text="'#' + ${f.id}">#1</td>
+                                <td>
+                                    <div class="fw-bold" th:text="${f.studentName}">Student Name</div>
+                                    <small class="text-muted" th:text="${f.studentAdmissionNumber}">ADM-001</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border" th:text="${f.month}">OCTOBER-2026</span>
+                                </td>
+                                <td>
+                                    <small class="d-block text-muted">
+                                        Rent: ₹<span th:text="${f.roomRent}">0</span> | Mess: ₹<span th:text="${f.messFee}">0</span>
+                                    </small>
+                                    <small class="d-block text-muted">
+                                        Power: ₹<span th:text="${f.electricityFee}">0</span> | Maint: ₹<span th:text="${f.maintenanceFee}">0</span>
+                                    </small>
+                                </td>
+                                <td class="fw-bold" th:text="'₹' + ${#numbers.formatDecimal(f.totalAmount, 1, 'COMMA', 2, 'POINT')}">₹9,500.00</td>
+                                <td class="fw-bold text-success" th:text="'₹' + ${#numbers.formatDecimal(f.paidAmount, 1, 'COMMA', 2, 'POINT')}">₹5,000.00</td>
+                                <td class="fw-bold text-danger" th:text="'₹' + ${#numbers.formatDecimal(f.pendingAmount, 1, 'COMMA', 2, 'POINT')}">₹4,500.00</td>
+                                <td>
+                                    <span th:text="${#temporals.format(f.dueDate, 'dd-MM-yyyy')}">15-10-2026</span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${f.status.name() == 'PAID' ? 'bg-success' : (f.status.name() == 'PARTIAL' ? 'bg-primary' : (f.status.name() == 'PENDING' ? 'bg-warning text-dark' : 'bg-danger'))}"
+                                          th:text="${f.status}">PENDING</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:if="${f.status.name() != 'PAID'}"
+                                           th:href="@{/accountant/payments/record(feeId=${f.id})}"
+                                           class="btn btn-outline-success"
+                                           title="Record Payment">
+                                            <i class="bi bi-cash-stack"></i>
+                                        </a>
+                                        <a th:href="@{/accountant/fees/edit/{id}(id=${f.id})}"
+                                           class="btn btn-outline-primary"
+                                           title="Edit Invoice">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form th:action="@{/accountant/fees/delete/{id}(id=${f.id})}"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this fee invoice? All linked payment records may also be affected.');">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete Invoice">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(fees)}">
+                                <td colspan="10" class="text-center py-5 text-muted">
+                                    <i class="bi bi-receipt fs-1 d-block mb-2"></i>
+                                    No fee invoices found matching the criteria.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,365 @@
+HTTP/1.1 200 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: text/html;charset=UTF-8
+Content-Language: en-IN
+Transfer-Encoding: chunked
+Date: Thu, 08 Oct 2026 12:54:38 GMT
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Requests - Smart PG &amp; Hostel</title>
+    
+    <!-- Instant theme restoration to prevent FOUC -->
+    <script>
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('smart_hostel_theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Custom Theme CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Global Theme JS -->
+    <script src="/js/theme.js" defer></script>
+</head>
+<body>
+
+<header class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container-fluid px-3 px-lg-4">
+        <!-- Sidebar Toggle for Mobile -->
+        <button class="btn btn-sm btn-outline-secondary d-lg-none me-2" type="button" id="sidebarToggle">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+
+        <!-- Brand -->
+        <a class="brand-logo text-decoration-none" href="/">
+            <i class="bi bi-buildings-fill"></i>
+            <span>Smart PG &amp; Hostel</span>
+        </a>
+
+        <!-- Right Side: Theme Toggle, User info & Logout -->
+        <div class="d-flex align-items-center gap-2 gap-md-3 ms-auto">
+            <!-- Global Theme Toggle Button -->
+            <button class="btn btn-sm btn-outline-secondary theme-toggle-btn shadow-sm" type="button" id="themeToggleBtn" title="Toggle Theme" aria-label="Toggle Theme">
+                <i class="bi bi-moon-stars-fill theme-icon"></i>
+                <span class="d-none d-sm-inline theme-text">🌙 Dark Mode</span>
+            </button>
+
+            <!-- User Badge -->
+            <div class="d-none d-sm-flex flex-column text-end">
+                <span class="fw-semibold text-dark small">Chief Warden</span>
+                <span class="badge badge-role bg-primary">WARDEN</span>
+            </div>
+
+            <!-- Profile & Logout Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-light rounded-circle p-2 shadow-sm border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle fs-5 text-secondary"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="fw-bold">Chief Warden</div>
+                        <div class="text-muted small">warden@smarthostel.com</div>
+                    </li>
+                    
+                    <li>
+                        <form action="/logout" method="post" class="m-0">
+                            <button type="submit" class="dropdown-item py-2 text-danger">
+                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="app-container">
+    <aside class="app-sidebar" id="appSidebar">
+    <div class="sidebar-heading">Navigation Menu</div>
+    <ul class="sidebar-nav">
+        <!-- ================= WARDEN NAVIGATION ================= -->
+        
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/dashboard">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/students">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Manage Students</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/rooms">
+                    <i class="bi bi-door-closed-fill"></i>
+                    <span>Manage Rooms</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/allocations">
+                    <i class="bi bi-key-fill"></i>
+                    <span>Room Allocations</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/complaints">
+                    <i class="bi bi-tools"></i>
+                    <span>Complaints</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/warden/leaves">
+                    <i class="bi bi-calendar2-check-fill"></i>
+                    <span>Leave Requests</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/visitors">
+                    <i class="bi bi-person-badge-fill"></i>
+                    <span>Visitor Requests</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/notices">
+                    <i class="bi bi-megaphone-fill"></i>
+                    <span>Notices</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/mess">
+                    <i class="bi bi-egg-fried"></i>
+                    <span>Mess Timetable</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/reports">
+                    <i class="bi bi-bar-chart-fill"></i>
+                    <span>Reports &amp; Analytics</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warden/users">
+                    <i class="bi bi-shield-lock-fill"></i>
+                    <span>User Accounts</span>
+                </a>
+            </li>
+        
+
+        <!-- ================= COMPLAINT STAFF NAVIGATION ================= -->
+        
+
+        <!-- ================= STUDENT NAVIGATION ================= -->
+        
+
+        <!-- ================= ACCOUNTANT NAVIGATION ================= -->
+        
+    </ul>
+
+    <!-- Quick Footer in sidebar -->
+    <div class="mt-auto p-3 text-center border-top border-secondary small text-secondary">
+        <div>Smart PG &amp; Hostel</div>
+        <div class="text-white-50" style="font-size: 0.75rem;">Role-Based System 2026</div>
+    </div>
+</aside>
+
+    <main class="app-content">
+        <div>
+    <!-- Success Alert -->
+    
+
+    <!-- Error Alert -->
+    
+</div>
+
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Student Leave Pass Management</h3>
+                <p class="text-muted small mb-0">Review out-of-campus leave requests and grant digital gate passes</p>
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="card card-custom mb-4">
+            <div class="card-body p-3">
+                <form action="/warden/leaves" method="get" class="row g-2 align-items-center">
+                    <div class="col-md-7">
+                        <input type="text" class="form-control" name="search" value="" placeholder="Search student name, admission no...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="PENDING">PENDING</option>
+                            <option value="APPROVED">APPROVED</option>
+                            <option value="REJECTED">REJECTED</option>
+                            <option value="CANCELLED">CANCELLED</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100 fw-semibold">Filter</button>
+                        <a href="/warden/leaves" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Leaves Table Card -->
+        <div class="card card-custom">
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Leave Type</th>
+                        <th>Duration / Dates</th>
+                        <th>Reason</th>
+                        <th>Emergency Contact</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <div class="fw-semibold text-dark">Dhruv</div>
+                            <span class="badge bg-light text-dark border small">24EARAD045</span>
+                            <div class="text-muted small">9462072054</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary-subtle text-primary">HOME_VISIT</span>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">2026-10-15 to 2026-10-21</div>
+                            <div class="text-muted small">7 Day(s)</div>
+                        </td>
+                        <td>
+                            <div class="fw-medium text-dark text-truncate" style="max-width: 200px;">lmoij,khpugbjggovfityftug</div>
+                            
+                        </td>
+                        <td>5410568453</td>
+                        <td>
+                            <span class="badge badge-status status-pending">PENDING</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveLeaveModal1">
+                                    <i class="bi bi-check-lg"></i> Accept
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectLeaveModal1">
+                                    <i class="bi bi-x-lg"></i> Reject
+                                </button>
+                            </div>
+                            
+
+                            <!-- Approve Leave Modal -->
+                            <div class="modal fade text-start" id="approveLeaveModal1" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form action="/warden/leaves/approve/1" method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title fw-bold text-success"><i class="bi bi-check-circle-fill me-2"></i>Approve Leave Pass</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Approve leave request for <strong>Dhruv</strong> from <strong>2026-10-15</strong> to <strong>2026-10-21</strong>?</p>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Approval Remarks</label>
+                                                    <input type="text" name="adminRemarks" class="form-control" placeholder="e.g. Leave pass granted with guardian confirmation">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-success btn-sm">Confirm Approval</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reject Leave Modal -->
+                            <div class="modal fade text-start" id="rejectLeaveModal1" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form action="/warden/leaves/reject/1" method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title fw-bold text-danger"><i class="bi bi-x-circle-fill me-2"></i>Reject Leave Request</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Reject leave request for <strong>Dhruv</strong>.</p>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                                                    <textarea name="adminRemarks" class="form-control" rows="2" placeholder="e.g. Midterm exams scheduled during this period" required></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-danger btn-sm">Confirm Rejection</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<footer class="py-3 bg-white border-top text-center text-muted small mt-auto">
+    <div class="container">
+        &copy; 2026 Smart PG &amp; Hostel Management System &bull; Advanced Java Lab Project &bull; Spring Boot + Bootstrap 5 + MySQL
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS (Includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js for Reports & Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <!-- Global Theme JS -->
+    <script src="/js/theme.js"></script>
+
+    <!-- Sidebar Mobile Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('appSidebar');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('show');
+                });
+            }
+        });
+    </script>
+</footer>
+
+</body>
+</html>

@@ -40,4 +40,16 @@ public class LeaveResponse {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public String getAdmissionNumber() {
+        return this.studentAdmissionNumber;
+    }
+
+    public long getTotalDays() {
+        return this.numberOfDays;
+    }
+
+    public String getWardenRemarks() {
+        return this.adminRemarks;
+    }
 }

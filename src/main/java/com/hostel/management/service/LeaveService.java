@@ -15,7 +15,11 @@ public interface LeaveService {
 
     LeaveResponse approveLeave(Long id, LeaveActionRequest request);
 
+    LeaveResponse approveLeave(Long id, LeaveActionRequest request, String wardenEmail);
+
     LeaveResponse rejectLeave(Long id, LeaveActionRequest request);
+
+    LeaveResponse rejectLeave(Long id, LeaveActionRequest request, String wardenEmail);
 
     LeaveResponse cancelLeave(Long id, String currentUserEmail);
 

@@ -27,7 +27,7 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<NoticeResponse>> createNotice(
             @Valid @RequestBody CreateNoticeRequest request,
             @AuthenticationPrincipal UserDetails userDetails
@@ -40,7 +40,7 @@ public class NoticeController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<NoticeResponse>> updateNotice(
             @PathVariable Long id,
             @Valid @RequestBody UpdateNoticeRequest request
@@ -50,7 +50,7 @@ public class NoticeController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<PageResponse<NoticeResponse>>> getAllNotices(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -68,21 +68,21 @@ public class NoticeController {
     }
 
     @GetMapping("/active")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<List<NoticeResponse>>> getActiveNotices() {
         List<NoticeResponse> response = noticeService.getActiveNotices();
         return ResponseEntity.ok(ApiResponse.success("Active notices retrieved successfully", response));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<NoticeResponse>> getNoticeById(@PathVariable Long id) {
         NoticeResponse response = noticeService.getNoticeById(id);
         return ResponseEntity.ok(ApiResponse.success("Notice details retrieved successfully", response));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<String>> deleteNotice(@PathVariable Long id) {
         noticeService.deleteNotice(id);
         return ResponseEntity.ok(ApiResponse.success("Notice deleted successfully", null));

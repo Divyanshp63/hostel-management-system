@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('PBL Reports & Analytics')}">
+    <title>PBL Reports - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('reports')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Wardenistrative Reports &amp; Analytics</h3>
+                <p class="text-muted small mb-0">Official PBL evaluation statistics &bull; Comprehensive hostel operational metrics</p>
+            </div>
+            <button onclick="window.print()" class="btn btn-outline-secondary btn-sm shadow-sm">
+                <i class="bi bi-printer me-1"></i> Print / Export Report
+            </button>
+        </div>
+
+        <!-- Official 9 PBL Metrics Cards -->
+        <div class="row g-3 mb-4">
+            <!-- 1. Total Students -->
+            <div class="col-md-4 col-xl-4">
+                <div class="stat-card border-start border-4 border-primary">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase">1. Total Students</div>
+                            <h3 class="fw-bold my-1 text-dark" th:text="${totalStudents}">0</h3>
+                            <div class="small text-muted">Registered Resident Students</div>
+                        </div>
+                        <div class="stat-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Total Rooms -->
+            <div class="col-md-4 col-xl-4">
+                <div class="stat-card border-start border-4 border-info">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase">2. Total Rooms</div>
+                            <h3 class="fw-bold my-1 text-dark" th:text="${totalRooms}">0</h3>
+                            <div class="small text-muted" th:text="${totalBeds} + ' Total Physical Beds'">0 Beds</div>
+                        </div>
+                        <div class="stat-icon bg-info-subtle text-info">
+                            <i class="bi bi-door-closed-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Occupied Beds -->
+            <div class="col-md-4 col-xl-4">
+                <div class="stat-card border-start border-4 border-danger">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase">3. Occupied Beds</div>
+                            <h3 class="fw-bold my-1 text-danger" th:text="${occupiedBeds}">0</h3>
+                            <div class="small text-muted">Actively Inhabited Beds</div>
+                        </div>
+                        <div class="stat-icon bg-danger-subtle text-danger">
+                            <i class="bi bi-person-fill-lock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Available Beds -->
+            <div class="col-md-4 col-xl-4">
+                <div class="stat-card border-start border-4 border-success">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase">4. Available Beds</div>
+                            <h3 class="fw-bold my-1 text-success" th:text="${availableBeds}">0</h3>
+                            <div class="small text-muted">Available for Immediate Allocation</div>
+                        </div>
+                        <div class="stat-icon bg-success-subtle text-success">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Pending Fees -->
+            <div class="col-md-4 col-xl-4">
+                <div class="stat-card border-start border-4 border-warning">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase">5. Pending Fees</div>
+                            <h3 class="fw-bold my-1 text-warning-emphasis" th:text="'₹' + ${#numbers.formatDecimal(pendingFees, 1, 'COMMA', 2, 'POINT')}">₹0.00</h3>
+                            <div class="small text-muted">Total Outstanding Resident Dues</div>
+                        </div>
+                        <div class="stat-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-hourglass-bottom"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Total Fee Collection -->
+            <div class="col-md-4 col-xl-4">
+                <div class="stat-card border-start border-4 border-success">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase">6. Total Fee Collection</div>
+                            <h3 class="fw-bold my-1 text-success" th:text="'₹' + ${#numbers.formatDecimal(feeCollection, 1, 'COMMA', 2, 'POINT')}">₹0.00</h3>
+                            <div class="small text-muted">Verified Payments Received</div>
+                        </div>
+                        <div class="stat-icon bg-success-subtle text-success">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. Pending Complaints -->
+            <div class="col-md-4 col-xl-4">
+                <div class="stat-card border-start border-4 border-danger">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase">7. Pending Complaints</div>
+                            <h3 class="fw-bold my-1 text-danger" th:text="${pendingComplaints}">0</h3>
+                            <div class="small text-muted">Open Grievance Tickets</div>
+                        </div>
+                        <div class="stat-icon bg-danger-subtle text-danger">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Resolved Complaints -->
+            <div class="col-md-4 col-xl-4">
+                <div class="stat-card border-start border-4 border-primary">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase">8. Resolved Complaints</div>
+                            <h3 class="fw-bold my-1 text-primary" th:text="${resolvedComplaints}">0</h3>
+                            <div class="small text-muted">Successfully Resolved</div>
+                        </div>
+                        <div class="stat-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. Active Room Allocations -->
+            <div class="col-md-4 col-xl-4">
+                <div class="stat-card border-start border-4 border-dark">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase">9. Active Allocations</div>
+                            <h3 class="fw-bold my-1 text-dark" th:text="${activeAllocations}">0</h3>
+                            <div class="small text-muted">Current Live Bed Contracts</div>
+                        </div>
+                        <div class="stat-icon bg-secondary-subtle text-dark">
+                            <i class="bi bi-key-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Analytics Charts Row -->
+        <div class="row g-4 mb-4">
+            <!-- Chart 1: Bed Capacity & Occupancy -->
+            <div class="col-lg-4">
+                <div class="card card-custom h-100">
+                    <div class="card-header">
+                        <i class="bi bi-pie-chart-fill me-2 text-primary"></i> Bed Occupancy Ratio
+                    </div>
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <div style="height: 220px; width: 100%;">
+                            <canvas id="occupancyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 2: Financial Billing vs Collection -->
+            <div class="col-lg-4">
+                <div class="card card-custom h-100">
+                    <div class="card-header">
+                        <i class="bi bi-bar-chart-fill me-2 text-success"></i> Revenue vs Pending Dues
+                    </div>
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <div style="height: 220px; width: 100%;">
+                            <canvas id="financialChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 3: Complaints Resolution -->
+            <div class="col-lg-4">
+                <div class="card card-custom h-100">
+                    <div class="card-header">
+                        <i class="bi bi-pie-chart me-2 text-warning"></i> Complaint Resolution Status
+                    </div>
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <div style="height: 220px; width: 100%;">
+                            <canvas id="complaintsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table 1: Active Allocations Table -->
+        <div class="card card-custom mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-key me-2 text-dark"></i> Active Room Allocations Summary</span>
+                <span class="badge bg-primary" th:text="${activeAllocations} + ' Active'">0 Active</span>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Admission No</th>
+                        <th>Room No</th>
+                        <th>Bed No</th>
+                        <th>Type</th>
+                        <th>Start Date</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="a : ${allocationsList}" th:if="${a.status.name() == 'ACTIVE'}">
+                        <td class="fw-semibold text-dark" th:text="${a.student.user.name}">Student</td>
+                        <td th:text="${a.student.admissionNumber}">ADM-001</td>
+                        <td class="fw-bold text-primary" th:text="${a.room.roomNumber}">A-101</td>
+                        <td th:text="${a.bedNumber != null ? a.bedNumber : '-'}">B1</td>
+                        <td th:text="${a.room.roomType}">DOUBLE</td>
+                        <td th:text="${a.startDate != null ? a.startDate : a.requestDate}">2026-08-01</td>
+                        <td><span class="badge bg-success-subtle text-success">ACTIVE</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Table 2: Recent Payment Transactions -->
+        <div class="card card-custom">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-cash-coin me-2 text-success"></i> Recent Payment Receipts</span>
+                <a th:href="@{/accountant/payments}" class="btn btn-sm btn-link p-0 text-decoration-none">Full Audit Log</a>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Student</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Date &amp; Time</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${recentPayments}">
+                        <td class="fw-bold" th:text="${p.transactionId}">TXN-1234</td>
+                        <td th:text="${p.student.user.name}">Student Name</td>
+                        <td class="fw-bold text-success" th:text="'₹' + ${#numbers.formatDecimal(p.amount, 1, 'COMMA', 2, 'POINT')}">₹10,000.00</td>
+                        <td><span class="badge bg-light text-dark border" th:text="${p.paymentMethod}">UPI</span></td>
+                        <td class="small text-muted" th:text="${#temporals.format(p.paymentDate, 'dd-MMM-yyyy HH:mm')}">05-Oct-2026</td>
+                        <td><span class="badge bg-success-subtle text-success">SUCCESS</span></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(recentPayments)}">
+                        <td colspan="6" class="text-center py-4 text-muted">No payment records found</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Chart.js Setup for PBL Report -->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const occupiedBeds = /*[[${occupiedBeds}]]*/ 0;
+        const availableBeds = /*[[${availableBeds}]]*/ 0;
+        const feeCollection = /*[[${feeCollection}]]*/ 0;
+        const pendingFees = /*[[${pendingFees}]]*/ 0;
+        const pendingComplaints = /*[[${pendingComplaints}]]*/ 0;
+        const resolvedComplaints = /*[[${resolvedComplaints}]]*/ 0;
+
+        // 1. Bed Occupancy Donut Chart
+        new Chart(document.getElementById('occupancyChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Occupied Beds', 'Available Beds'],
+                datasets: [{
+                    data: [occupiedBeds, availableBeds],
+                    backgroundColor: ['#ef4444', '#22c55e'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // 2. Financial Bar Chart
+        new Chart(document.getElementById('financialChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Collected', 'Pending Dues'],
+                datasets: [{
+                    label: 'Amount (₹)',
+                    data: [feeCollection, pendingFees],
+                    backgroundColor: ['#10b981', '#f59e0b'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // 3. Complaints Pie Chart
+        new Chart(document.getElementById('complaintsChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Pending', 'Resolved'],
+                datasets: [{
+                    data: [pendingComplaints, resolvedComplaints],
+                    backgroundColor: ['#f97316', '#3b82f6'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

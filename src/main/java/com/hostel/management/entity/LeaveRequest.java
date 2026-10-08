@@ -49,6 +49,10 @@ public class LeaveRequest {
     @Builder.Default
     private LeaveStatus status = LeaveStatus.PENDING;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approved_by_id")
+    private User approvedBy;
+
     @Column(name = "admin_remarks", length = 255)
     private String adminRemarks;
 
@@ -59,6 +63,41 @@ public class LeaveRequest {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    public String getWardenRemarks() {
+        return this.adminRemarks;
+    }
+
+    public void setWardenRemarks(String remarks) {
+        this.adminRemarks = remarks;
+    }
+
+    public String getStudentName() {
+        return this.student != null && this.student.getUser() != null ? this.student.getUser().getName() : "Unknown";
+    }
+
+    public String getAdmissionNumber() {
+        return this.student != null ? this.student.getAdmissionNumber() : "";
+    }
+
+    public String getStudentAdmissionNumber() {
+        return getAdmissionNumber();
+    }
+
+    public String getStudentPhone() {
+        return this.student != null && this.student.getUser() != null ? this.student.getUser().getPhone() : "";
+    }
+
+    public long getTotalDays() {
+        if (this.fromDate != null && this.toDate != null) {
+            return java.time.temporal.ChronoUnit.DAYS.between(this.fromDate, this.toDate) + 1;
+        }
+        return 0;
+    }
+
+    public long getNumberOfDays() {
+        return getTotalDays();
+    }
 
     @PrePersist
     protected void onCreate() {

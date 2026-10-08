@@ -40,7 +40,7 @@ public class LeaveController {
     }
 
     @PutMapping("/{id}/approve")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<LeaveResponse>> approveLeave(
             @PathVariable Long id,
             @RequestBody(required = false) LeaveActionRequest request
@@ -51,7 +51,7 @@ public class LeaveController {
     }
 
     @PutMapping("/{id}/reject")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<LeaveResponse>> rejectLeave(
             @PathVariable Long id,
             @RequestBody(required = false) LeaveActionRequest request
@@ -62,7 +62,7 @@ public class LeaveController {
     }
 
     @PutMapping("/{id}/cancel")
-    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'WARDEN')")
     public ResponseEntity<ApiResponse<LeaveResponse>> cancelLeave(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
@@ -72,7 +72,7 @@ public class LeaveController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<PageResponse<LeaveResponse>>> getAllLeaves(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -98,7 +98,7 @@ public class LeaveController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT')")
     public ResponseEntity<ApiResponse<LeaveResponse>> getLeaveById(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
@@ -108,7 +108,7 @@ public class LeaveController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<String>> deleteLeave(@PathVariable Long id) {
         leaveService.deleteLeave(id);
         return ResponseEntity.ok(ApiResponse.success("Leave record deleted successfully", null));

@@ -35,25 +35,25 @@ public class RoomAllocationController {
     ) {
         RoomAllocationResponse response = roomAllocationService.requestAllocation(request, userDetails.getUsername());
         return new ResponseEntity<>(
-                ApiResponse.success("Room allocation requested successfully. Awaiting admin approval.", response),
+                ApiResponse.success("Room allocation requested successfully. Awaiting warden approval.", response),
                 HttpStatus.CREATED
         );
     }
 
     @PostMapping("/direct")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<RoomAllocationResponse>> directAllocate(
             @Valid @RequestBody AdminAllocationRequest request
     ) {
         RoomAllocationResponse response = roomAllocationService.directAllocate(request);
         return new ResponseEntity<>(
-                ApiResponse.success("Room allocated directly by Admin", response),
+                ApiResponse.success("Room allocated directly by Warden", response),
                 HttpStatus.CREATED
         );
     }
 
     @PutMapping("/{id}/approve")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<RoomAllocationResponse>> approveAllocation(
             @PathVariable Long id,
             @Valid @RequestBody ApprovalRequest request
@@ -63,7 +63,7 @@ public class RoomAllocationController {
     }
 
     @PutMapping("/{id}/reject")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<RoomAllocationResponse>> rejectAllocation(
             @PathVariable Long id,
             @Valid @RequestBody RejectionRequest request
@@ -73,14 +73,14 @@ public class RoomAllocationController {
     }
 
     @PutMapping("/{id}/vacate")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<RoomAllocationResponse>> vacateAllocation(@PathVariable Long id) {
         RoomAllocationResponse response = roomAllocationService.vacateAllocation(id);
         return ResponseEntity.ok(ApiResponse.success("Room vacated successfully and bed released", response));
     }
 
     @PutMapping("/{id}/cancel")
-    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'WARDEN')")
     public ResponseEntity<ApiResponse<RoomAllocationResponse>> cancelAllocation(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
@@ -90,7 +90,7 @@ public class RoomAllocationController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<PageResponse<RoomAllocationResponse>>> getAllAllocations(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -115,7 +115,7 @@ public class RoomAllocationController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<ApiResponse<RoomAllocationResponse>> getAllocationById(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails

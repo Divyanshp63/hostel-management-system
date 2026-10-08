@@ -22,12 +22,14 @@ public class VisitorResponse {
     private String studentName;
     private String studentAdmissionNumber;
     private String studentPhone;
+    private String roomNumber;
 
     // Visitor details
     private String visitorName;
     private String visitorPhone;
     private String relation;
     private LocalDate visitDate;
+    private String visitTime;
     private LocalDateTime checkInTime;
     private LocalDateTime checkOutTime;
     private VisitorStatus status;
@@ -35,6 +37,7 @@ public class VisitorResponse {
     private String idProofNumber;
     private String purpose;
     private String adminRemarks;
+    private String wardenRemarks;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

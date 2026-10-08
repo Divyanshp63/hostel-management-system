@@ -1,7 +1,8 @@
 package com.hostel.management.enums;
 
 public enum Role {
-    ADMIN,
+    WARDEN,
     STUDENT,
-    ACCOUNTANT
+    ACCOUNTANT,
+    COMPLAINT_STAFF
 }

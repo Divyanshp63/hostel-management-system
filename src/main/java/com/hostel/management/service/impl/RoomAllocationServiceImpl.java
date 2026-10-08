@@ -54,7 +54,7 @@ public class RoomAllocationServiceImpl implements RoomAllocationService {
 
         // Business Rule 2: Cannot make multiple pending requests
         if (roomAllocationRepository.existsByStudentIdAndStatus(student.getId(), AllocationStatus.PENDING)) {
-            throw new BadRequestException("You already have a PENDING room allocation request awaiting admin approval.");
+            throw new BadRequestException("You already have a PENDING room allocation request awaiting warden approval.");
         }
 
         Room room = roomRepository.findById(request.getRoomId())
@@ -113,7 +113,7 @@ public class RoomAllocationServiceImpl implements RoomAllocationService {
                 .status(AllocationStatus.ACTIVE)
                 .requestDate(LocalDate.now())
                 .startDate(LocalDate.now())
-                .remarks(request.getRemarks() != null ? request.getRemarks().trim() : "Directly allocated by Admin")
+                .remarks(request.getRemarks() != null ? request.getRemarks().trim() : "Directly allocated by Warden")
                 .build();
 
         RoomAllocation savedAllocation = roomAllocationRepository.save(allocation);

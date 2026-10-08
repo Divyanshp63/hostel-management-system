@@ -1,6 +1,7 @@
 package com.hostel.management.dto.request;
 
 import com.hostel.management.enums.ComplaintCategory;
+import com.hostel.management.enums.ComplaintPriority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -23,6 +24,9 @@ public class CreateComplaintRequest {
     @Size(min = 10, message = "Description must be at least 10 characters long")
     private String description;
 
-    @NotNull(message = "Complaint category is required (MAINTENANCE, ELECTRICAL, PLUMBING, CLEANLINESS, FOOD_MESS, SECURITY, OTHER)")
+    @NotNull(message = "Complaint category is required")
     private ComplaintCategory category;
+
+    @Builder.Default
+    private ComplaintPriority priority = ComplaintPriority.MEDIUM;
 }

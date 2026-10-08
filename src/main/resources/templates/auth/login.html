@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('Login')}">
+    <title>Login - Smart PG &amp; Hostel</title>
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100 py-4 position-relative">
+
+<!-- Theme toggle top right -->
+<div class="position-absolute top-0 end-0 p-3">
+    <button class="btn btn-sm btn-outline-secondary theme-toggle-btn shadow-sm" type="button" id="loginThemeToggleBtn" title="Toggle Theme" aria-label="Toggle Theme">
+        <i class="bi bi-moon-stars-fill theme-icon"></i>
+        <span class="theme-text">🌙 Dark Mode</span>
+    </button>
+</div>
+
+<div class="container" style="max-width: 440px;">
+    <!-- Brand Title -->
+    <div class="text-center mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle p-3 shadow-sm mb-3">
+            <i class="bi bi-buildings-fill fs-2"></i>
+        </div>
+        <h3 class="fw-bold text-dark">Smart PG &amp; Hostel</h3>
+        <p class="text-muted small">Role-Based Management &amp; Complaint Resolution System</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-0 pt-4 px-4 pb-0 text-center">
+            <h4 class="fw-bold mb-1">Sign In</h4>
+            <p class="text-muted small mb-0">Enter your credentials to access your dashboard</p>
+        </div>
+
+        <div class="card-body p-4">
+            <!-- Flash Messages -->
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+            <!-- Login Form -->
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold small">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control border-start-0" id="email" name="email" placeholder="Enter your registered email" required autofocus>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label for="password" class="form-label fw-semibold small mb-0">Password</label>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text border-end-0 text-muted"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control border-start-0" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm mb-3">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                </button>
+            </form>
+
+            <!-- Registration Link -->
+            <div class="text-center mt-3 pt-3 border-top">
+                <span class="text-muted small">Don't have an account? </span>
+                <a th:href="@{/register}" class="fw-semibold text-primary text-decoration-none small">Register</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/theme.js}"></script>
+</body>
+</html>

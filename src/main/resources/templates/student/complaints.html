@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('My Complaints')}">
+    <title>My Complaints - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('complaints')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">My Complaints &amp; Service Requests</h3>
+                <p class="text-muted small mb-0">Direct Maintenance routing &bull; Real-time status tracking &bull; Warden verification</p>
+            </div>
+            <a th:href="@{/student/complaints/new}" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Lodge New Complaint
+            </a>
+        </div>
+
+        <!-- 5 Dynamic MySQL Counter Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-4 border-primary">
+                    <div class="text-muted small text-uppercase fw-semibold">My Complaints</div>
+                    <div class="fs-4 fw-bold text-dark mt-1" th:text="${myComplaintsCount}">0</div>
+                    <div class="small text-muted">Total registered</div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-4 border-info">
+                    <div class="text-muted small text-uppercase fw-semibold">Open Complaints</div>
+                    <div class="fs-4 fw-bold text-info mt-1" th:text="${openComplaintsCount}">0</div>
+                    <div class="small text-muted">Awaiting maintenance</div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-4 border-warning">
+                    <div class="text-muted small text-uppercase fw-semibold">In Progress</div>
+                    <div class="fs-4 fw-bold text-warning mt-1" th:text="${inProgressCount}">0</div>
+                    <div class="small text-muted">Being fixed / returned</div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-4 border-secondary">
+                    <div class="text-muted small text-uppercase fw-semibold">Resolved</div>
+                    <div class="fs-4 fw-bold text-secondary mt-1" th:text="${resolvedCount}">0</div>
+                    <div class="small text-muted">Awaiting Warden check</div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-4 border-success">
+                    <div class="text-muted small text-uppercase fw-semibold">Closed</div>
+                    <div class="fs-4 fw-bold text-success mt-1" th:text="${closedCount}">0</div>
+                    <div class="small text-muted">Verified &amp; completed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complaints Table Card -->
+        <div class="card card-custom">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <div class="fw-bold text-dark"><i class="bi bi-list-task me-2 text-primary"></i> Complaint History &amp; Status</div>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle small">
+                    <i class="bi bi-shield-check me-1"></i> Automatic Maintenance Routing
+                </span>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-custom table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Category &amp; Title</th>
+                        <th>Priority &amp; SLA</th>
+                        <th>Department &amp; Staff</th>
+                        <th>Status</th>
+                        <th>Resolution &amp; Verification</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${complaints}">
+                        <td class="fw-bold text-primary">
+                            <span th:text="${c.complaintCode != null ? c.complaintCode : '#' + c.id}">#1</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border fw-semibold" th:text="${c.category}">PLUMBING</span>
+                            <div class="fw-bold text-dark mt-1" th:text="${c.title}">Title</div>
+                            <div class="text-muted small text-truncate" style="max-width: 240px;" th:text="${c.description}">Description</div>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${c.priority.name() == 'CRITICAL' ? 'bg-danger text-white' : (c.priority.name() == 'HIGH' ? 'bg-warning text-dark' : (c.priority.name() == 'MEDIUM' ? 'bg-info text-dark' : 'bg-secondary text-white'))}"
+                                  th:text="${c.priority}">MEDIUM</span>
+                            <div th:if="${c.slaBreached}" class="mt-1">
+                                <span class="badge bg-danger text-white small">SLA BREACHED</span>
+                            </div>
+                            <div class="small text-muted mt-1" th:text="${#temporals.format(c.createdAt, 'dd-MMM-yyyy HH:mm')}">Date</div>
+                        </td>
+                        <td>
+                            <div>
+                                <span class="badge bg-secondary-subtle text-secondary small mb-1">
+                                    <i class="bi bi-tools me-1"></i><span th:text="${c.assignedDepartment}">MAINTENANCE</span>
+                                </span>
+                            </div>
+                            <div th:if="${c.assignedStaffName != null}">
+                                <span class="small text-dark fw-semibold" th:text="${c.assignedStaffName}">Staff Name</span>
+                            </div>
+                            <div th:if="${c.assignedStaffName == null}">
+                                <span class="text-muted small fst-italic">Pending staff pick</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${c.status.name() == 'SUBMITTED' ? 'bg-primary' : 
+                                                  (c.status.name() == 'IN_PROGRESS' ? 'bg-warning text-dark' : 
+                                                  (c.status.name() == 'RESOLVED_BY_MAINTENANCE' ? 'bg-info text-dark' : 
+                                                  (c.status.name() == 'RETURNED' ? 'bg-danger text-white' : 
+                                                  (c.status.name() == 'VERIFIED' ? 'bg-success text-white' : 
+                                                  (c.status.name() == 'CLOSED' ? 'bg-success text-white' : 'bg-secondary')))))}"
+                                  th:text="${c.status}">
+                                SUBMITTED
+                            </span>
+                            <div th:if="${c.status.name() == 'RESOLVED_BY_MAINTENANCE'}" class="mt-1">
+                                <span class="badge bg-warning-subtle text-warning border small">Awaiting Warden Verification</span>
+                            </div>
+                            <div th:if="${c.status.name() == 'RETURNED'}" class="mt-1">
+                                <span class="badge bg-danger-subtle text-danger border small">Returned for Rework</span>
+                            </div>
+                        </td>
+                        <td>
+                            <!-- Maintenance Resolution Details -->
+                            <div th:if="${c.effectiveResolutionDetails != null}" class="small mb-1">
+                                <strong class="text-success"><i class="bi bi-wrench-adjustable me-1"></i>Resolution:</strong>
+                                <span class="text-dark" th:text="${c.effectiveResolutionDetails}">Fixed issue</span>
+                            </div>
+
+                            <!-- Warden Verification Remarks -->
+                            <div th:if="${c.effectiveVerificationRemarks != null}" class="small mb-1">
+                                <strong class="text-primary"><i class="bi bi-shield-check me-1"></i>Warden Note:</strong>
+                                <span class="text-dark" th:text="${c.effectiveVerificationRemarks}">Verified ok</span>
+                            </div>
+
+                            <!-- Student Rating -->
+                            <div th:if="${c.rating != null}" class="text-warning small">
+                                <strong>My Rating:</strong> <span th:text="${c.rating} + ' ★'">5 ★</span>
+                                <span th:if="${c.feedback != null}" class="text-muted ms-1" th:text="'(' + ${c.feedback} + ')'">(Good)</span>
+                            </div>
+
+                            <div th:if="${c.effectiveResolutionDetails == null and c.effectiveVerificationRemarks == null and c.rating == null}" class="text-muted small fst-italic">
+                                Under maintenance workflow
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                <!-- View Details / History Modal Button -->
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                        data-bs-toggle="modal" th:data-bs-target="'#historyModal' + ${c.id}">
+                                    <i class="bi bi-info-circle me-1"></i> Details
+                                </button>
+
+                                <!-- Feedback button if CLOSED and not rated yet -->
+                                <button th:if="${(c.status.name() == 'CLOSED' or c.status.name() == 'VERIFIED') and c.rating == null}"
+                                        type="button" class="btn btn-warning btn-sm text-dark fw-semibold"
+                                        data-bs-toggle="modal" th:data-bs-target="'#feedbackModal' + ${c.id}">
+                                    <i class="bi bi-star-fill me-1"></i> Rate
+                                </button>
+                            </div>
+
+                            <!-- Details & History Modal -->
+                            <div class="modal fade text-start" th:id="'historyModal' + ${c.id}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-light">
+                                            <h5 class="modal-title fw-bold text-dark">
+                                                <i class="bi bi-journal-text me-2 text-primary"></i>
+                                                Complaint Details &amp; History: <span th:text="${c.complaintCode != null ? c.complaintCode : '#' + c.id}">#1</span>
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Overview Details Grid -->
+                                            <div class="row g-3 mb-4">
+                                                <div class="col-md-6">
+                                                    <div class="p-3 bg-light rounded-3">
+                                                        <div class="text-muted small text-uppercase fw-semibold mb-1">Issue Details</div>
+                                                        <div class="fw-bold text-dark fs-6" th:text="${c.title}">Title</div>
+                                                        <div class="text-muted small mt-1" th:text="${c.description}">Description</div>
+                                                        <div class="mt-2 d-flex gap-2">
+                                                            <span class="badge bg-secondary" th:text="${c.category}">PLUMBING</span>
+                                                            <span class="badge bg-info text-dark" th:text="'Priority: ' + ${c.priority}">MEDIUM</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="p-3 bg-light rounded-3">
+                                                        <div class="text-muted small text-uppercase fw-semibold mb-1">Workflow Status</div>
+                                                        <div class="mb-2">
+                                                            <span class="badge"
+                                                                  th:classappend="${c.status.name() == 'SUBMITTED' ? 'bg-primary' : 
+                                                                                  (c.status.name() == 'IN_PROGRESS' ? 'bg-warning text-dark' : 
+                                                                                  (c.status.name() == 'RESOLVED_BY_MAINTENANCE' ? 'bg-info text-dark' : 
+                                                                                  (c.status.name() == 'RETURNED' ? 'bg-danger text-white' : 
+                                                                                  (c.status.name() == 'CLOSED' ? 'bg-success text-white' : 'bg-secondary'))))}"
+                                                                  th:text="${c.status}">
+                                                                SUBMITTED
+                                                            </span>
+                                                        </div>
+                                                        <div class="small text-muted"><strong>Department:</strong> MAINTENANCE</div>
+                                                        <div class="small text-muted" th:if="${c.assignedStaffName != null}">
+                                                            <strong>Assigned Staff:</strong> <span th:text="${c.assignedStaffName}">Staff</span>
+                                                        </div>
+                                                        <div class="small text-muted" th:if="${c.acceptedAt != null}">
+                                                            <strong>Work Accepted:</strong> <span th:text="${#temporals.format(c.acceptedAt, 'dd-MMM-yyyy HH:mm')}">Date</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Maintenance Resolution Section -->
+                                            <div th:if="${c.effectiveResolutionDetails != null}" class="card border-success border-opacity-25 bg-success-subtle mb-3">
+                                                <div class="card-body p-3">
+                                                    <div class="fw-bold text-success mb-1">
+                                                        <i class="bi bi-wrench me-1"></i> Maintenance Department Resolution
+                                                    </div>
+                                                    <p class="mb-1 text-dark small" th:text="${c.effectiveResolutionDetails}">Resolution notes</p>
+                                                    <div class="text-muted" style="font-size: 0.75rem;" th:if="${c.resolvedAt != null}">
+                                                        Resolved at: <span th:text="${#temporals.format(c.resolvedAt, 'dd-MMM-yyyy HH:mm')}">Time</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Warden Verification Section -->
+                                            <div th:if="${c.effectiveVerificationRemarks != null}" class="card border-primary border-opacity-25 bg-primary-subtle mb-3">
+                                                <div class="card-body p-3">
+                                                    <div class="fw-bold text-primary mb-1">
+                                                        <i class="bi bi-shield-check me-1"></i> Warden Verification Remarks
+                                                    </div>
+                                                    <p class="mb-1 text-dark small" th:text="${c.effectiveVerificationRemarks}">Verification remarks</p>
+                                                    <div class="text-muted" style="font-size: 0.75rem;" th:if="${c.verifiedAt != null}">
+                                                        Verified by: <span th:text="${c.verifiedByName != null ? c.verifiedByName : 'Warden'}">Warden</span>
+                                                        at <span th:text="${#temporals.format(c.verifiedAt, 'dd-MMM-yyyy HH:mm')}">Time</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Complete History Timeline -->
+                                            <h6 class="fw-bold text-dark mt-4 mb-3"><i class="bi bi-clock-history me-2 text-secondary"></i>Audit History Timeline</h6>
+                                            <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                                                <div th:each="h : ${c.history}" class="list-group-item p-3">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <span class="fw-bold text-dark" th:text="${h.action}">Action</span>
+                                                        <span class="text-muted small" th:text="${#temporals.format(h.timestamp, 'dd-MMM-yyyy HH:mm')}">Date</span>
+                                                    </div>
+                                                    <div class="small text-muted mb-1">
+                                                        By: <strong class="text-dark" th:text="${h.performedBy}">Name</strong>
+                                                        <span class="badge bg-light text-secondary border ms-1" th:text="${h.role}">STUDENT</span>
+                                                    </div>
+                                                    <div th:if="${h.remarks != null and !h.remarks.isEmpty()}" class="small bg-light p-2 rounded text-dark">
+                                                        <i class="bi bi-chat-left-text me-1 text-muted"></i>
+                                                        <span th:text="${h.remarks}">Remarks</span>
+                                                    </div>
+                                                </div>
+                                                <div th:if="${c.history == null or #lists.isEmpty(c.history)}" class="list-group-item p-3 text-muted text-center small">
+                                                    No history logs recorded yet.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Feedback Modal (Only for Closed/Verified tickets) -->
+                            <div th:if="${c.status.name() == 'CLOSED' or c.status.name() == 'VERIFIED'}"
+                                 class="modal fade text-start" th:id="'feedbackModal' + ${c.id}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form th:action="@{/student/complaints/feedback/{id}(id=${c.id})}" method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title fw-bold"><i class="bi bi-star-half me-2 text-warning"></i>Rate Resolution</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>How satisfied are you with the resolution of: <strong th:text="${c.title}">Title</strong>?</p>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-semibold small">Rating (1 to 5 Stars) <span class="text-danger">*</span></label>
+                                                    <select class="form-select" name="rating" required>
+                                                        <option value="5">★★★★★ - Excellent (5)</option>
+                                                        <option value="4">★★★★☆ - Good (4)</option>
+                                                        <option value="3">★★★☆☆ - Average (3)</option>
+                                                        <option value="2">★★☆☆☆ - Poor (2)</option>
+                                                        <option value="1">★☆☆☆☆ - Very Poor (1)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-semibold small">Feedback Remarks</label>
+                                                    <textarea class="form-control" name="feedback" rows="3" placeholder="Provide optional comments on repair quality..."></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary btn-sm fw-semibold">Submit Feedback</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(complaints)}">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-tools fs-1 text-secondary d-block mb-2"></i>
+                            <div class="mb-3">No complaints found.</div>
+                            <a th:href="@{/student/complaints/new}" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                                <i class="bi bi-plus-circle me-1"></i> Submit New Complaint
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

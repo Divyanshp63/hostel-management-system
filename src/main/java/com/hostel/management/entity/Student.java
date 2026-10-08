@@ -27,6 +27,9 @@ public class Student {
     @Column(name = "admission_number", unique = true, nullable = false, length = 50)
     private String admissionNumber;
 
+    @Column(length = 150)
+    private String college;
+
     @Column(nullable = false, length = 100)
     private String course;
 
@@ -42,6 +45,9 @@ public class Student {
 
     @Column(name = "blood_group", length = 10)
     private String bloodGroup;
+
+    @Column(name = "hostel_name", length = 100)
+    private String hostelName;
 
     @Column(columnDefinition = "TEXT")
     private String address;

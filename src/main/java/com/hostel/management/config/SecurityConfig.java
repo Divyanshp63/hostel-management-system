@@ -1,5 +1,7 @@
 package com.hostel.management.config;
 
+import com.hostel.management.security.CustomAccessDeniedHandler;
+import com.hostel.management.security.CustomAuthenticationSuccessHandler;
 import com.hostel.management.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.time.LocalDateTime;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -30,6 +30,8 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    private final CustomAuthenticationSuccessHandler authSuccessHandler;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -54,33 +56,62 @@ public class SecurityConfig {
         http
                 .cors(org.springframework.security.config.Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/api/auth/**", "/api/health/**").permitAll()
-                        // Role-based route protection
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/accountant/**").hasAnyRole("ADMIN", "ACCOUNTANT")
-                        .requestMatchers("/api/student/**").hasAnyRole("ADMIN", "STUDENT")
+                        // Static resources and public pages
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/register",
+                                "/access-denied",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/webjars/**",
+                                "/favicon.ico",
+                                "/error",
+                                "/api/auth/**",
+                                "/api/health/**"
+                        ).permitAll()
+                        // Warden routes (and legacy admin routes protected for WARDEN)
+                        .requestMatchers("/warden/**", "/api/warden/**", "/admin/**", "/api/admin/**").hasRole("WARDEN")
+                        // Accountant role routes
+                        .requestMatchers("/accountant/**", "/api/accountant/**").hasRole("ACCOUNTANT")
+                        // Student role routes
+                        .requestMatchers("/student/**", "/api/student/**").hasRole("STUDENT")
+                        // Complaint Department / Maintenance Staff role routes
+                        .requestMatchers("/complaint-staff/**", "/api/complaint-staff/**", "/maintenance/**", "/api/maintenance/**").hasRole("COMPLAINT_STAFF")
                         // Any other request must be authenticated
                         .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("email")
+                        .passwordParameter("password")
+                        .successHandler(authSuccessHandler)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("SMART_HOSTEL_SESSION", "JSESSIONID")
+                        .permitAll()
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(accessDeniedHandler)
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.setContentType("application/json");
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getOutputStream().println(
-                                    "{\"success\":false,\"message\":\"Full authentication is required to access this resource\",\"data\":null,\"timestamp\":\"" + LocalDateTime.now() + "\"}"
-                            );
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.setContentType("application/json");
-                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.getOutputStream().println(
-                                    "{\"success\":false,\"message\":\"Access denied: You do not have permission to access this resource\",\"data\":null,\"timestamp\":\"" + LocalDateTime.now() + "\"}"
-                            );
+                            if (request.getRequestURI().startsWith("/api/")) {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.setContentType("application/json");
+                                response.getWriter().write("{\"success\":false,\"message\":\"Full authentication required\"}");
+                            } else {
+                                response.sendRedirect(request.getContextPath() + "/login");
+                            }
                         })
                 );
 

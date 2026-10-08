@@ -31,6 +31,8 @@ public class CreateVisitorRequest {
     @FutureOrPresent(message = "Visit date cannot be in the past")
     private LocalDate visitDate;
 
+    private String visitTime;
+
     @NotBlank(message = "Purpose of visit is required")
     private String purpose;
 

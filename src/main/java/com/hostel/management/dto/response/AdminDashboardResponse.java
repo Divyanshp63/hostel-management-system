@@ -35,8 +35,13 @@ public class AdminDashboardResponse {
 
     // Operations & Welfare
     private long pendingComplaints;
+    private long pendingVerificationCount;
+    private long verifiedCount;
+    private long returnedCount;
+    private long totalComplaints;
     private long inProgressComplaints;
     private long resolvedComplaints;
+    private long escalatedComplaints; // SLA Breached complaints
     private long pendingLeaves;
     private long activeVisitorsToday;
     private long activeNoticesCount;

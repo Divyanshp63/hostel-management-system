@@ -119,7 +119,7 @@ public class StudentServiceImpl implements StudentService {
         User currentUser = userRepository.findByEmail(currentUserEmail.trim().toLowerCase())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + currentUserEmail));
 
-        // Enforce ownership: STUDENT can only update their own profile; ADMIN can update any
+        // Enforce ownership: STUDENT can only update their own profile; WARDEN can update any
         if (currentUser.getRole() == Role.STUDENT && !student.getUser().getId().equals(currentUser.getId())) {
             throw new UnauthorizedException("You are not authorized to update another student's profile");
         }

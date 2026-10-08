@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,10 @@ public interface RoomAllocationRepository extends JpaRepository<RoomAllocation, 
     Optional<RoomAllocation> findByStudentIdAndStatus(Long studentId, AllocationStatus status);
 
     boolean existsByStudentIdAndStatus(Long studentId, AllocationStatus status);
+
+    boolean existsByStudentIdAndStatusIn(Long studentId, Collection<AllocationStatus> statuses);
+
+    boolean existsByRoomIdAndBedNumberAndStatusIn(Long roomId, String bedNumber, Collection<AllocationStatus> statuses);
 
     List<RoomAllocation> findByStudentIdOrderByCreatedAtDesc(Long studentId);
 

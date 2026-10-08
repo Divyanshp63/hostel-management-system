@@ -19,12 +19,12 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
-    @GetMapping("/admin")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
-    public ResponseEntity<ApiResponse<AdminDashboardResponse>> getAdminDashboard() {
+    @GetMapping({"/warden", "/admin"})
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
+    public ResponseEntity<ApiResponse<AdminDashboardResponse>> getWardenDashboard() {
         AdminDashboardResponse response = dashboardService.getAdminDashboardStats();
         return ResponseEntity.ok(
-                ApiResponse.success("Admin dashboard statistics retrieved successfully", response)
+                ApiResponse.success("Warden dashboard statistics retrieved successfully", response)
         );
     }
 

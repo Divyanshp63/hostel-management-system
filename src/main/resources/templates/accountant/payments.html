@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Payment Transactions')}"></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/sidebar :: sidebar('payments')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h3 class="fw-bold mb-1">Fee Payment Transactions</h3>
+                <p class="text-muted mb-0">Complete ledger of fee payment collections and transactions.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/accountant/payments/record}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Record New Payment
+                </a>
+            </div>
+        </div>
+
+        <!-- Payments Table -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#ID</th>
+                                <th>Transaction Ref</th>
+                                <th>Student</th>
+                                <th>Fee Month</th>
+                                <th>Amount Paid</th>
+                                <th>Method</th>
+                                <th>Date &amp; Time</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${payments}">
+                                <td class="fw-semibold text-muted" th:text="'#' + ${p.id}">#1</td>
+                                <td>
+                                    <code class="fw-bold text-primary" th:text="${p.transactionId}">TXN-123456</code>
+                                </td>
+                                <td>
+                                    <div class="fw-bold" th:text="${p.fee.student.user.name}">Student Name</div>
+                                    <small class="text-muted" th:text="${p.fee.student.admissionNumber}">ADM-001</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border" th:text="${p.fee.month}">OCTOBER-2026</span>
+                                </td>
+                                <td class="fw-bold text-success" th:text="'₹' + ${#numbers.formatDecimal(p.amount, 1, 'COMMA', 2, 'POINT')}">₹5,000.00</td>
+                                <td>
+                                    <span class="badge bg-secondary" th:text="${p.paymentMethod}">UPI</span>
+                                </td>
+                                <td>
+                                    <span th:text="${#temporals.format(p.paymentDate, 'dd-MM-yyyy HH:mm')}">01-10-2026 14:30</span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${p.paymentStatus.name() == 'SUCCESS' ? 'bg-success' : (p.paymentStatus.name() == 'PENDING' ? 'bg-warning text-dark' : 'bg-danger')}"
+                                          th:text="${p.paymentStatus}">SUCCESS</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted" th:text="${p.remarks != null ? p.remarks : '-'}">-</small>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(payments)}">
+                                <td colspan="9" class="text-center py-5 text-muted">
+                                    <i class="bi bi-wallet2 fs-1 d-block mb-2"></i>
+                                    No payment transactions recorded yet.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

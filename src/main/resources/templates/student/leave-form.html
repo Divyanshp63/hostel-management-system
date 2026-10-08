@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('Apply for Leave')}">
+    <title>Apply for Leave - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('leaves')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Apply for Campus Leave Pass</h3>
+                <p class="text-muted small mb-0">Submit official request for out-of-campus absence</p>
+            </div>
+            <a th:href="@{/student/leaves}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to Leaves
+            </a>
+        </div>
+
+        <div class="card card-custom">
+            <div class="card-body p-4 p-md-5">
+                <form th:action="@{/student/leaves/save}" th:object="${leave}" method="post">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="leaveType" class="form-label">Leave Type <span class="text-danger">*</span></label>
+                            <select class="form-select" th:field="*{leaveType}" id="leaveType" th:classappend="${#fields.hasErrors('leaveType')} ? 'is-invalid' : ''">
+                                <option value="">-- Choose Leave Category --</option>
+                                <option th:each="t : ${leaveTypes}" th:value="${t}" th:text="${t}">HOME_VISIT</option>
+                            </select>
+                            <div class="invalid-feedback" th:errors="*{leaveType}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="fromDate" class="form-label">From Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" th:field="*{fromDate}" id="fromDate" th:classappend="${#fields.hasErrors('fromDate')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{fromDate}"></div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="toDate" class="form-label">To Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" th:field="*{toDate}" id="toDate" th:classappend="${#fields.hasErrors('toDate')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{toDate}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="emergencyContactPhone" class="form-label">Emergency Contact Phone Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{emergencyContactPhone}" id="emergencyContactPhone" placeholder="10-digit emergency number" maxlength="10" th:classappend="${#fields.hasErrors('emergencyContactPhone')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:errors="*{emergencyContactPhone}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="destinationAddress" class="form-label">Destination Address During Leave</label>
+                            <input type="text" class="form-control" th:field="*{destinationAddress}" id="destinationAddress" placeholder="e.g. Home address or relative's city">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="reason" class="form-label">Reason for Absence <span class="text-danger">*</span></label>
+                            <textarea class="form-control" th:field="*{reason}" id="reason" rows="3" placeholder="Provide complete explanation for your absence..." th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"></textarea>
+                            <div class="invalid-feedback" th:errors="*{reason}"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a th:href="@{/student/leaves}" class="btn btn-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-send-fill me-1"></i> Submit Leave Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

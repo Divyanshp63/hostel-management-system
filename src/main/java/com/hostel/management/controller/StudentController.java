@@ -23,7 +23,7 @@ public class StudentController {
     private final StudentService studentService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<StudentResponse>> createStudent(
             @Valid @RequestBody CreateStudentRequest request
     ) {
@@ -35,7 +35,7 @@ public class StudentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<PageResponse<StudentResponse>>> getAllStudents(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -48,14 +48,14 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<StudentResponse>> getStudentById(@PathVariable Long id) {
         StudentResponse response = studentService.getStudentById(id);
         return ResponseEntity.ok(ApiResponse.success("Student details retrieved successfully", response));
     }
 
     @GetMapping("/profile/me")
-    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'WARDEN')")
     public ResponseEntity<ApiResponse<StudentResponse>> getMyStudentProfile(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
@@ -64,7 +64,7 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT')")
     public ResponseEntity<ApiResponse<StudentResponse>> updateStudent(
             @PathVariable Long id,
             @Valid @RequestBody UpdateStudentRequest request,
@@ -75,7 +75,7 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<String>> deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);
         return ResponseEntity.ok(ApiResponse.success("Student and associated user account deleted successfully", null));

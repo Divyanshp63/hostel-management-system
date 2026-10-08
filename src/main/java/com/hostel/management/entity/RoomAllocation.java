@@ -45,6 +45,10 @@ public class RoomAllocation {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "allocated_by_id")
+    private User allocatedBy;
+
     @Column(name = "rejection_reason", length = 255)
     private String rejectionReason;
 

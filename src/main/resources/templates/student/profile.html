@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('My Profile')}">
+    <title>My Profile - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('profile')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Resident Student Profile</h3>
+                <p class="text-muted small mb-0">View and update your personal and emergency contact information</p>
+            </div>
+            <a th:href="@{/student/profile/edit}" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                <i class="bi bi-pencil-square me-1"></i> Edit Profile
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card card-custom text-center p-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle p-3 mb-3 mx-auto" style="width: 80px; height: 80px;">
+                        <i class="bi bi-person-fill fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold mb-1 text-dark" th:text="${student.user.name}">Student Name</h5>
+                    <p class="text-muted small mb-2" th:text="${student.course} + ' (' + ${student.yearOfStudy} + ')'">Course</p>
+                    <span class="badge bg-light text-dark border px-3 py-2" th:text="${student.admissionNumber}">HOSTEL-2026-0001</span>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <!-- Academic & Personal Card -->
+                <div class="card card-custom mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-person-lines-fill me-2 text-primary"></i> Academic &amp; Contact Details
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-3 small">
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Login Email:</span>
+                                <span class="fw-semibold text-dark" th:text="${student.user.email}">email@hostel.com</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Primary Mobile:</span>
+                                <span class="fw-semibold text-dark" th:text="${student.user.phone}">9876543210</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Gender:</span>
+                                <span class="fw-semibold text-dark" th:text="${student.gender}">MALE</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Blood Group:</span>
+                                <span class="fw-semibold text-dark" th:text="${student.bloodGroup != null ? student.bloodGroup : 'N/A'}">O+</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Date of Birth:</span>
+                                <span class="fw-semibold text-dark" th:text="${student.dateOfBirth != null ? student.dateOfBirth : 'N/A'}">2004-05-15</span>
+                            </div>
+                            <div class="col-12">
+                                <span class="text-muted d-block">Permanent Address:</span>
+                                <span class="text-dark" th:text="${student.address}">Address</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guardian Card -->
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <i class="bi bi-shield-check me-2 text-primary"></i> Guardian &amp; Emergency Contacts
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-3 small">
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Guardian Name:</span>
+                                <span class="fw-semibold text-dark" th:text="${student.guardianName}">Guardian Name</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Guardian Phone:</span>
+                                <span class="fw-semibold text-dark" th:text="${student.guardianPhone}">9876500000</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Emergency Contact:</span>
+                                <span class="fw-bold text-danger" th:text="${student.emergencyContact}">9876543210</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

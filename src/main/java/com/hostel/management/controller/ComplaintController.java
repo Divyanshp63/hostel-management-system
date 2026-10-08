@@ -39,8 +39,51 @@ public class ComplaintController {
         );
     }
 
+    @PostMapping("/{id}/accept")
+    @PreAuthorize("hasRole('COMPLAINT_STAFF')")
+    public ResponseEntity<ApiResponse<ComplaintResponse>> acceptComplaint(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        ComplaintResponse response = complaintService.acceptComplaint(id, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("Complaint ticket accepted and moved to IN_PROGRESS", response));
+    }
+
+    @PostMapping("/{id}/resolve")
+    @PreAuthorize("hasRole('COMPLAINT_STAFF')")
+    public ResponseEntity<ApiResponse<ComplaintResponse>> resolveComplaint(
+            @PathVariable Long id,
+            @RequestParam String resolutionRemarks,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        ComplaintResponse response = complaintService.resolveComplaint(id, resolutionRemarks, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("Complaint marked as RESOLVED_BY_MAINTENANCE", response));
+    }
+
+    @PostMapping("/{id}/verify")
+    @PreAuthorize("hasRole('WARDEN')")
+    public ResponseEntity<ApiResponse<ComplaintResponse>> verifyComplaint(
+            @PathVariable Long id,
+            @RequestParam(required = false) String remarks,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        ComplaintResponse response = complaintService.verifyComplaintByWarden(id, remarks, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("Complaint verified and CLOSED by Warden", response));
+    }
+
+    @PostMapping("/{id}/return")
+    @PreAuthorize("hasRole('WARDEN')")
+    public ResponseEntity<ApiResponse<ComplaintResponse>> returnComplaint(
+            @PathVariable Long id,
+            @RequestParam String reason,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        ComplaintResponse response = complaintService.returnComplaintByWarden(id, reason, userDetails.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("Complaint returned to Maintenance Department", response));
+    }
+
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'COMPLAINT_STAFF')")
     public ResponseEntity<ApiResponse<ComplaintResponse>> updateComplaintStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateComplaintStatusRequest request
@@ -50,7 +93,7 @@ public class ComplaintController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'COMPLAINT_STAFF')")
     public ResponseEntity<ApiResponse<PageResponse<ComplaintResponse>>> getAllComplaints(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -76,7 +119,7 @@ public class ComplaintController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT', 'COMPLAINT_STAFF')")
     public ResponseEntity<ApiResponse<ComplaintResponse>> getComplaintById(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
@@ -86,7 +129,7 @@ public class ComplaintController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<String>> deleteComplaint(@PathVariable Long id) {
         complaintService.deleteComplaint(id);
         return ResponseEntity.ok(ApiResponse.success("Complaint deleted successfully", null));

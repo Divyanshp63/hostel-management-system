@@ -16,7 +16,11 @@ public interface VisitorService {
 
     VisitorResponse approveVisitorRequest(Long id, VisitorApprovalRequest request);
 
+    VisitorResponse approveVisitorRequest(Long id, VisitorApprovalRequest request, String wardenEmail);
+
     VisitorResponse rejectVisitorRequest(Long id, VisitorRejectionRequest request);
+
+    VisitorResponse rejectVisitorRequest(Long id, VisitorRejectionRequest request, String wardenEmail);
 
     VisitorResponse completeVisit(Long id);
 

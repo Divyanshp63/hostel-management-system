@@ -42,7 +42,7 @@ public class VisitorController {
     }
 
     @PutMapping("/{id}/approve")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<VisitorResponse>> approveVisitorRequest(
             @PathVariable Long id,
             @RequestBody(required = false) VisitorApprovalRequest request
@@ -53,7 +53,7 @@ public class VisitorController {
     }
 
     @PutMapping("/{id}/reject")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<VisitorResponse>> rejectVisitorRequest(
             @PathVariable Long id,
             @Valid @RequestBody VisitorRejectionRequest request
@@ -63,14 +63,14 @@ public class VisitorController {
     }
 
     @PutMapping("/{id}/complete")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<VisitorResponse>> completeVisit(@PathVariable Long id) {
         VisitorResponse response = visitorService.completeVisit(id);
         return ResponseEntity.ok(ApiResponse.success("Visitor check-out logged and visit marked as completed", response));
     }
 
     @PutMapping("/{id}/cancel")
-    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'WARDEN')")
     public ResponseEntity<ApiResponse<VisitorResponse>> cancelVisitorRequest(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
@@ -80,7 +80,7 @@ public class VisitorController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<PageResponse<VisitorResponse>>> getAllVisitorRequests(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -106,7 +106,7 @@ public class VisitorController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'STUDENT')")
     public ResponseEntity<ApiResponse<VisitorResponse>> getVisitorRequestById(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
@@ -116,7 +116,7 @@ public class VisitorController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<String>> deleteVisitorRequest(@PathVariable Long id) {
         visitorService.deleteVisitorRequest(id);
         return ResponseEntity.ok(ApiResponse.success("Visitor record deleted successfully", null));

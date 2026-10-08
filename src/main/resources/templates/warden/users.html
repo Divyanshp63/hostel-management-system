@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('User Management')}">
+    <title>User Management - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('users')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">System User Accounts</h3>
+                <p class="text-muted small mb-0">Manage Wardenistrator, accountant, and student login access and roles</p>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="bi bi-person-plus-fill me-1"></i> Add Staff / User
+            </button>
+        </div>
+
+        <!-- Add User Modal -->
+        <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form th:action="@{/warden/users/new}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold">Create System Staff User</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control" placeholder="Staff Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email Address (Login Username) <span class="text-danger">*</span></label>
+                                <input type="email" name="email" class="form-control" placeholder="staff@hostel.com" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Password <span class="text-danger">*</span></label>
+                                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="text" name="phone" class="form-control" placeholder="9876543210" maxlength="10" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Role <span class="text-danger">*</span></label>
+                                <select class="form-select" name="role" required>
+                                    <option value="ACCOUNTANT">Accountant</option>
+                                    <option value="Warden">Warden / Warden</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary btn-sm fw-semibold">Create Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table Card -->
+        <div class="card card-custom">
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>User Name</th>
+                        <th>Email (Login)</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Account Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td class="fw-bold" th:text="'#' + ${u.id}">#1</td>
+                        <td class="fw-semibold text-dark" th:text="${u.name}">User Name</td>
+                        <td th:text="${u.email}">user@hostel.com</td>
+                        <td th:text="${u.phone}">9876543210</td>
+                        <td>
+                            <span class="badge badge-role"
+                                  th:classappend="${u.role.name() == 'Warden' ? 'role-Warden' : (u.role.name() == 'ACCOUNTANT' ? 'role-accountant' : 'role-student')}"
+                                  th:text="${u.role}">Warden</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${u.enabled ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}"
+                                  th:text="${u.enabled ? 'ACTIVE' : 'DISABLED'}">ACTIVE</span>
+                        </td>
+                        <td class="text-end">
+                            <form th:action="@{/warden/users/toggle/{id}(id=${u.id})}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm"
+                                        th:classappend="${u.enabled ? 'btn-outline-danger' : 'btn-outline-success'}"
+                                        th:text="${u.enabled ? 'Disable' : 'Enable'}">
+                                    Disable
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

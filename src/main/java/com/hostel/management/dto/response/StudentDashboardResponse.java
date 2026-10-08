@@ -38,6 +38,11 @@ public class StudentDashboardResponse {
 
     // Welfare & Requests Overview
     private long myPendingComplaints;
+    private long myComplaintsCount;
+    private long openComplaintsCount;
+    private long inProgressComplaintsCount;
+    private long resolvedComplaintsCount;
+    private long closedComplaintsCount;
     private String latestComplaintStatus;
     private long myPendingLeaves;
     private long myPendingVisitors;

@@ -27,7 +27,7 @@ public class FeeController {
     private final FeeService feeService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<FeeResponse>> createFee(
             @Valid @RequestBody CreateFeeRequest request
     ) {
@@ -39,7 +39,7 @@ public class FeeController {
     }
 
     @PostMapping("/bulk")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<List<FeeResponse>>> generateBulkFees(
             @Valid @RequestBody BulkFeeGenerationRequest request
     ) {
@@ -51,7 +51,7 @@ public class FeeController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<FeeResponse>> updateFee(
             @PathVariable Long id,
             @Valid @RequestBody UpdateFeeRequest request
@@ -61,7 +61,7 @@ public class FeeController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<PageResponse<FeeResponse>>> getAllFees(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -85,14 +85,14 @@ public class FeeController {
     }
 
     @GetMapping("/student/{studentId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT')")
     public ResponseEntity<ApiResponse<List<FeeResponse>>> getFeesByStudentId(@PathVariable Long studentId) {
         List<FeeResponse> response = feeService.getFeesByStudentId(studentId);
         return ResponseEntity.ok(ApiResponse.success("Student fee invoices retrieved successfully", response));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('WARDEN', 'ACCOUNTANT', 'STUDENT')")
     public ResponseEntity<ApiResponse<FeeResponse>> getFeeById(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails
@@ -102,7 +102,7 @@ public class FeeController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('WARDEN')")
     public ResponseEntity<ApiResponse<String>> deleteFee(@PathVariable Long id) {
         feeService.deleteFee(id);
         return ResponseEntity.ok(ApiResponse.success("Fee invoice deleted successfully", null));

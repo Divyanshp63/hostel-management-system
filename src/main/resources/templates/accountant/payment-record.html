@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Record Student Payment')}"></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/sidebar :: sidebar('record-payment')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Breadcrumb / Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a th:href="@{/accountant/payments}">Payments</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Record Payment</li>
+                    </ol>
+                </nav>
+                <h3 class="fw-bold mb-0">Record Fee Collection</h3>
+            </div>
+            <a th:href="@{/accountant/payments}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Payments
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="fw-bold mb-0">Payment Collection Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/accountant/payments/record}" th:object="${payment}" method="post">
+
+                            <!-- Select Outstanding Fee -->
+                            <div class="mb-3">
+                                <label for="feeId" class="form-label fw-semibold">Select Outstanding Invoice <span class="text-danger">*</span></label>
+                                <select id="feeId" th:field="*{feeId}" class="form-select"
+                                        th:classappend="${#fields.hasErrors('feeId')} ? 'is-invalid' : ''" required>
+                                    <option value="">-- Choose Pending Fee Invoice --</option>
+                                    <option th:each="f : ${pendingFees}"
+                                            th:value="${f.id}"
+                                            th:data-remaining="${f.remainingAmount}"
+                                            th:data-total="${f.totalAmount}"
+                                            th:data-student="${f.student.user.name}"
+                                            th:data-admission="${f.student.admissionNumber}"
+                                            th:text="'#' + ${f.id} + ' - ' + ${f.student.user.name} + ' (' + ${f.student.admissionNumber} + ') - ' + ${f.month} + ' [Due: ₹' + ${f.remainingAmount} + ']'">
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('feeId')}" th:errors="*{feeId}"></div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <!-- Payment Amount -->
+                                <div class="col-md-6">
+                                    <label for="amount" class="form-label fw-semibold">Amount Received (₹) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" min="1" id="amount" th:field="*{amount}" class="form-control"
+                                           th:classappend="${#fields.hasErrors('amount')} ? 'is-invalid' : ''" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
+                                    <small class="text-muted">Enter partial or full remaining amount</small>
+                                </div>
+
+                                <!-- Payment Method -->
+                                <div class="col-md-6">
+                                    <label for="paymentMethod" class="form-label fw-semibold">Payment Mode <span class="text-danger">*</span></label>
+                                    <select id="paymentMethod" th:field="*{paymentMethod}" class="form-select"
+                                            th:classappend="${#fields.hasErrors('paymentMethod')} ? 'is-invalid' : ''" required>
+                                        <option value="">-- Select Mode --</option>
+                                        <option th:each="m : ${methods}"
+                                                th:value="${m}"
+                                                th:text="${m}">
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}"></div>
+                                </div>
+                            </div>
+
+                            <!-- Remarks / Note -->
+                            <div class="mb-3">
+                                <label for="remarks" class="form-label fw-semibold">Transaction / Receipt Remarks</label>
+                                <input type="text" id="remarks" th:field="*{remarks}" class="form-control" placeholder="e.g. Bank Ref #998811 or Counter receipt...">
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <a th:href="@{/accountant/payments}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-success px-4">
+                                    <i class="bi bi-check-circle me-1"></i> Confirm &amp; Record Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side Card with Guide -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-4 bg-light">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3 text-secondary">RECEIPT SUMMARY</h6>
+                        <div id="selectionSummary" class="text-muted small">
+                            Select an invoice above to view billing details and quick-fill the remaining amount.
+                        </div>
+                        <button type="button" id="btnFillDue" class="btn btn-sm btn-outline-primary mt-3 w-100 d-none">
+                            Pay Full Due Balance
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 border-start border-success border-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-success"><i class="bi bi-shield-check me-2"></i>PBL Payment Automation</h6>
+                        <ul class="small text-muted ps-3 mb-0">
+                            <li>A unique transaction ID (e.g. <code>TXN-...</code>) is automatically generated.</li>
+                            <li>The paid amount is credited to the invoice.</li>
+                            <li>If full due is cleared, status automatically flips to <strong>PAID</strong>; otherwise <strong>PARTIAL</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    const feeSelect = document.getElementById('feeId');
+    const amountInput = document.getElementById('amount');
+    const summaryDiv = document.getElementById('selectionSummary');
+    const btnFillDue = document.getElementById('btnFillDue');
+
+    function updateSelectedFeeInfo() {
+        const opt = feeSelect.options[feeSelect.selectedIndex];
+        if (opt && opt.value) {
+            const student = opt.getAttribute('data-student');
+            const admission = opt.getAttribute('data-admission');
+            const remaining = parseFloat(opt.getAttribute('data-remaining')) || 0;
+            const total = parseFloat(opt.getAttribute('data-total')) || 0;
+
+            summaryDiv.innerHTML = `
+                <div class="mb-2"><strong>Student:</strong> ${student} (${admission})</div>
+                <div class="mb-2"><strong>Total Invoiced:</strong> ₹${total.toFixed(2)}</div>
+                <div class="mb-2 text-danger"><strong>Outstanding Balance:</strong> ₹${remaining.toFixed(2)}</div>
+            `;
+            btnFillDue.classList.remove('d-none');
+            btnFillDue.onclick = () => {
+                amountInput.value = remaining;
+            };
+
+            if (!amountInput.value || parseFloat(amountInput.value) <= 0) {
+                amountInput.value = remaining;
+            }
+        } else {
+            summaryDiv.innerHTML = 'Select an invoice above to view billing details and quick-fill the remaining amount.';
+            btnFillDue.classList.add('d-none');
+        }
+    }
+
+    feeSelect.addEventListener('change', updateSelectedFeeInfo);
+    window.addEventListener('DOMContentLoaded', updateSelectedFeeInfo);
+</script>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

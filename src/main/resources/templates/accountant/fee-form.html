@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Generate Student Fee Invoice')}"></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/sidebar :: sidebar('fees')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Breadcrumb / Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a th:href="@{/accountant/fees}">Fee Management</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">New Invoice</li>
+                    </ol>
+                </nav>
+                <h3 class="fw-bold mb-0">Generate Fee Invoice</h3>
+            </div>
+            <a th:href="@{/accountant/fees}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Invoices
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="fw-bold mb-0">Invoice Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/accountant/fees/save}" th:object="${fee}" method="post">
+                            
+                            <!-- Student Selection -->
+                            <div class="mb-3">
+                                <label for="studentId" class="form-label fw-semibold">Select Student <span class="text-danger">*</span></label>
+                                <select id="studentId" th:field="*{studentId}" class="form-select" th:classappend="${#fields.hasErrors('studentId')} ? 'is-invalid' : ''" required>
+                                    <option value="">-- Choose Student --</option>
+                                    <option th:each="st : ${students}"
+                                            th:value="${st.id}"
+                                            th:text="${st.user.name + ' (' + st.admissionNumber + ') - ' + (st.room != null ? 'Room ' + st.room.roomNumber : 'No Room')}">
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('studentId')}" th:errors="*{studentId}"></div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <!-- Month -->
+                                <div class="col-md-6">
+                                    <label for="month" class="form-label fw-semibold">Billing Month <span class="text-danger">*</span></label>
+                                    <input type="text" id="month" th:field="*{month}" class="form-control" placeholder="e.g. OCTOBER-2026"
+                                           th:classappend="${#fields.hasErrors('month')} ? 'is-invalid' : ''" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('month')}" th:errors="*{month}"></div>
+                                    <small class="text-muted">Format: MONTH-YYYY or YYYY-MM</small>
+                                </div>
+
+                                <!-- Due Date -->
+                                <div class="col-md-6">
+                                    <label for="dueDate" class="form-label fw-semibold">Payment Due Date <span class="text-danger">*</span></label>
+                                    <input type="date" id="dueDate" th:field="*{dueDate}" class="form-control"
+                                           th:classappend="${#fields.hasErrors('dueDate')} ? 'is-invalid' : ''" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></div>
+                                </div>
+                            </div>
+
+                            <h6 class="fw-bold border-bottom pb-2 mt-4 mb-3 text-primary">Fee Breakdown Components</h6>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="roomRent" class="form-label fw-semibold">Room Rent (₹) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" min="0" id="roomRent" th:field="*{roomRent}" class="form-control fee-input"
+                                           th:classappend="${#fields.hasErrors('roomRent')} ? 'is-invalid' : ''" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('roomRent')}" th:errors="*{roomRent}"></div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="messFee" class="form-label fw-semibold">Mess Fee (₹) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" min="0" id="messFee" th:field="*{messFee}" class="form-control fee-input"
+                                           th:classappend="${#fields.hasErrors('messFee')} ? 'is-invalid' : ''" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('messFee')}" th:errors="*{messFee}"></div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="electricityFee" class="form-label fw-semibold">Electricity Fee (₹) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" min="0" id="electricityFee" th:field="*{electricityFee}" class="form-control fee-input"
+                                           th:classappend="${#fields.hasErrors('electricityFee')} ? 'is-invalid' : ''" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('electricityFee')}" th:errors="*{electricityFee}"></div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="maintenanceFee" class="form-label fw-semibold">Maintenance Fee (₹) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" min="0" id="maintenanceFee" th:field="*{maintenanceFee}" class="form-control fee-input"
+                                           th:classappend="${#fields.hasErrors('maintenanceFee')} ? 'is-invalid' : ''" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('maintenanceFee')}" th:errors="*{maintenanceFee}"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="remarks" class="form-label fw-semibold">Remarks / Notes</label>
+                                <textarea id="remarks" th:field="*{remarks}" class="form-control" rows="2" placeholder="Optional invoice notes or deductions..."></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <a th:href="@{/accountant/fees}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-check-circle me-1"></i> Generate &amp; Issue Invoice
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Card -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-4 bg-light">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3 text-secondary">CALCULATED TOTAL</h6>
+                        <div class="display-6 fw-bold text-primary mb-2" id="totalPreview">₹0.00</div>
+                        <p class="text-muted small">Sum of room rent, mess fee, electricity, and maintenance.</p>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-1 small">
+                            <span class="text-muted">Room Rent:</span>
+                            <span class="fw-semibold" id="prevRent">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1 small">
+                            <span class="text-muted">Mess Charges:</span>
+                            <span class="fw-semibold" id="prevMess">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1 small">
+                            <span class="text-muted">Electricity:</span>
+                            <span class="fw-semibold" id="prevElec">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span class="text-muted">Maintenance:</span>
+                            <span class="fw-semibold" id="prevMaint">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0 border-start border-primary border-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold"><i class="bi bi-info-circle text-primary me-2"></i>PBL Fee Rules</h6>
+                        <ul class="small text-muted ps-3 mb-0">
+                            <li>Total invoice amount is automatically computed as the sum of all 4 components.</li>
+                            <li>Initial payment status is set to <strong>PENDING</strong>.</li>
+                            <li>Paid amount starts at <strong>₹0.00</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    function recalculateTotal() {
+        const rent = parseFloat(document.getElementById('roomRent').value) || 0;
+        const mess = parseFloat(document.getElementById('messFee').value) || 0;
+        const elec = parseFloat(document.getElementById('electricityFee').value) || 0;
+        const maint = parseFloat(document.getElementById('maintenanceFee').value) || 0;
+        const total = rent + mess + elec + maint;
+
+        document.getElementById('totalPreview').innerText = '₹' + total.toFixed(2);
+        document.getElementById('prevRent').innerText = '₹' + rent.toFixed(2);
+        document.getElementById('prevMess').innerText = '₹' + mess.toFixed(2);
+        document.getElementById('prevElec').innerText = '₹' + elec.toFixed(2);
+        document.getElementById('prevMaint').innerText = '₹' + maint.toFixed(2);
+    }
+
+    document.querySelectorAll('.fee-input').forEach(input => {
+        input.addEventListener('input', recalculateTotal);
+    });
+    window.addEventListener('DOMContentLoaded', recalculateTotal);
+</script>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

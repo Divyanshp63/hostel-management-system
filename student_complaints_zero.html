@@ -1,0 +1,262 @@
+HTTP/1.1 200 
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: text/html;charset=UTF-8
+Content-Language: en-IN
+Transfer-Encoding: chunked
+Date: Thu, 08 Oct 2026 12:59:28 GMT
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Complaints - Smart PG &amp; Hostel</title>
+    
+    <!-- Instant theme restoration to prevent FOUC -->
+    <script>
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('smart_hostel_theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Custom Theme CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Global Theme JS -->
+    <script src="/js/theme.js" defer></script>
+</head>
+<body>
+
+<header class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container-fluid px-3 px-lg-4">
+        <!-- Sidebar Toggle for Mobile -->
+        <button class="btn btn-sm btn-outline-secondary d-lg-none me-2" type="button" id="sidebarToggle">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+
+        <!-- Brand -->
+        <a class="brand-logo text-decoration-none" href="/">
+            <i class="bi bi-buildings-fill"></i>
+            <span>Smart PG &amp; Hostel</span>
+        </a>
+
+        <!-- Right Side: Theme Toggle, User info & Logout -->
+        <div class="d-flex align-items-center gap-2 gap-md-3 ms-auto">
+            <!-- Global Theme Toggle Button -->
+            <button class="btn btn-sm btn-outline-secondary theme-toggle-btn shadow-sm" type="button" id="themeToggleBtn" title="Toggle Theme" aria-label="Toggle Theme">
+                <i class="bi bi-moon-stars-fill theme-icon"></i>
+                <span class="d-none d-sm-inline theme-text">🌙 Dark Mode</span>
+            </button>
+
+            <!-- User Badge -->
+            <div class="d-none d-sm-flex flex-column text-end">
+                <span class="fw-semibold text-dark small">Student Resident</span>
+                <span class="badge badge-role bg-success">STUDENT</span>
+            </div>
+
+            <!-- Profile & Logout Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-light rounded-circle p-2 shadow-sm border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle fs-5 text-secondary"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="fw-bold">Student Resident</div>
+                        <div class="text-muted small">student@smarthostel.com</div>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2" href="/student/profile">
+                            <i class="bi bi-person me-2 text-primary"></i> My Profile
+                        </a>
+                    </li>
+                    <li>
+                        <form action="/logout" method="post" class="m-0">
+                            <button type="submit" class="dropdown-item py-2 text-danger">
+                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="app-container">
+    <aside class="app-sidebar" id="appSidebar">
+    <div class="sidebar-heading">Navigation Menu</div>
+    <ul class="sidebar-nav">
+        <!-- ================= WARDEN NAVIGATION ================= -->
+        
+
+        <!-- ================= COMPLAINT STAFF NAVIGATION ================= -->
+        
+
+        <!-- ================= STUDENT NAVIGATION ================= -->
+        
+            <li class="nav-item">
+                <a class="nav-link" href="/student/dashboard">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>My Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/student/profile">
+                    <i class="bi bi-person-bounding-box"></i>
+                    <span>My Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/student/room">
+                    <i class="bi bi-door-open-fill"></i>
+                    <span>My Room</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/student/fees">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>Fees &amp; Payments</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/student/complaints">
+                    <i class="bi bi-chat-square-text-fill"></i>
+                    <span>My Complaints</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/student/leaves">
+                    <i class="bi bi-calendar-event-fill"></i>
+                    <span>Leave Passes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/student/visitors">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Visitor Passes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/student/notices">
+                    <i class="bi bi-bell-fill"></i>
+                    <span>Notices</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/student/mess">
+                    <i class="bi bi-egg-fried"></i>
+                    <span>Mess Menu</span>
+                </a>
+            </li>
+        
+
+        <!-- ================= ACCOUNTANT NAVIGATION ================= -->
+        
+    </ul>
+
+    <!-- Quick Footer in sidebar -->
+    <div class="mt-auto p-3 text-center border-top border-secondary small text-secondary">
+        <div>Smart PG &amp; Hostel</div>
+        <div class="text-white-50" style="font-size: 0.75rem;">Role-Based System 2026</div>
+    </div>
+</aside>
+
+    <main class="app-content">
+        <div>
+    <!-- Success Alert -->
+    
+
+    <!-- Error Alert -->
+    
+</div>
+
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">My Complaints &amp; Service Requests</h3>
+                <p class="text-muted small mb-0">Track resolution progress, maintenance staff assignments, and provide feedback</p>
+            </div>
+            <a href="/student/complaints/new" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Lodge New Complaint
+            </a>
+        </div>
+
+        <!-- Complaints Table Card -->
+        <div class="card card-custom">
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Category &amp; Title</th>
+                        <th>Priority &amp; SLA</th>
+                        <th>Assigned Staff</th>
+                        <th>Status</th>
+                        <th>Resolution &amp; Feedback</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-tools fs-1 text-secondary d-block mb-2"></i>
+                            <div class="mb-3">No complaints found.</div>
+                            <a href="/student/complaints/new" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                                <i class="bi bi-plus-circle me-1"></i> Submit New Complaint
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<footer class="py-3 bg-white border-top text-center text-muted small mt-auto">
+    <div class="container">
+        &copy; 2026 Smart PG &amp; Hostel Management System &bull; Advanced Java Lab Project &bull; Spring Boot + Bootstrap 5 + MySQL
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS (Includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js for Reports & Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <!-- Global Theme JS -->
+    <script src="/js/theme.js"></script>
+
+    <!-- Sidebar Mobile Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('appSidebar');
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function () {
+                    sidebar.classList.toggle('show');
+                });
+            }
+        });
+    </script>
+</footer>
+
+</body>
+</html>

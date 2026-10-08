@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('My Assigned Room')}">
+    <title>My Room - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('room')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Hostel Room &amp; Bed Assignment</h3>
+                <p class="text-muted small mb-0">Your current residential room contract and roommate information</p>
+            </div>
+        </div>
+
+        <!-- Scenario 1: Active Room Allocation -->
+        <div th:if="${activeAllocation != null}">
+            <div class="row g-4 mb-4">
+                <!-- Room Details Card -->
+                <div class="col-lg-6">
+                    <div class="card card-custom h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-dark"><i class="bi bi-door-closed-fill me-2 text-primary"></i> Current Room Specifications</span>
+                            <span class="badge bg-success-subtle text-success">ACTIVE CONTRACT</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-primary-subtle text-primary rounded-3 p-3 me-3">
+                                    <i class="bi bi-buildings fs-1"></i>
+                                </div>
+                                <div>
+                                    <h2 class="fw-bold text-dark mb-0" th:text="'Room ' + ${activeAllocation.room.roomNumber}">Room A-101</h2>
+                                    <span class="text-muted small" th:text="${activeAllocation.room.blockName != null ? activeAllocation.room.blockName : 'Main Building'}">Block A</span>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 small">
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Bed Assignment:</span>
+                                    <span class="fw-bold text-primary fs-6" th:text="${activeAllocation.bedNumber != null ? activeAllocation.bedNumber : 'Assigned'}">Bed B1</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Room Sharing Type:</span>
+                                    <span class="fw-semibold text-dark" th:text="${activeAllocation.room.roomType}">DOUBLE</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Floor:</span>
+                                    <span class="fw-semibold text-dark" th:text="'Floor ' + ${activeAllocation.room.floor}">Floor 1</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Monthly Rent:</span>
+                                    <span class="fw-semibold text-dark" th:text="'₹' + ${activeAllocation.room.rentPerMonth} + '/month'">₹6,500/month</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Contract Start Date:</span>
+                                    <span class="fw-semibold text-dark" th:text="${activeAllocation.startDate}">2026-08-01</span>
+                                </div>
+                                <div class="col-12" th:if="${activeAllocation.room.description != null}">
+                                    <span class="text-muted d-block">Amenities &amp; Features:</span>
+                                    <span class="text-dark" th:text="${activeAllocation.room.description}">Attached Washroom, Wi-Fi</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roommates Card -->
+                <div class="col-lg-6">
+                    <div class="card card-custom h-100">
+                        <div class="card-header">
+                            <i class="bi bi-people-fill me-2 text-primary"></i> Fellow Room Residents
+                        </div>
+                        <div class="card-body p-0 table-responsive">
+                            <table class="table table-custom table-hover mb-0">
+                                <thead>
+                                <tr>
+                                    <th>Roommate Name</th>
+                                    <th>Bed</th>
+                                    <th>Course</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="rm : ${roommates}">
+                                    <td>
+                                        <div class="fw-semibold text-dark" th:text="${rm.student.user.name}">Priya Patel</div>
+                                        <div class="text-muted small" th:text="${rm.student.admissionNumber}">ADM-002</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border" th:text="${rm.bedNumber != null ? rm.bedNumber : 'Assigned'}">B2</span>
+                                    </td>
+                                    <td class="small" th:text="${rm.student.course} + ' (' + ${rm.student.yearOfStudy} + ')'">B.Tech IT</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(roommates)}">
+                                    <td colspan="3" class="text-center py-4 text-muted small">
+                                        No other roommates currently sharing this room.
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 2: Pending Allocation Request -->
+        <div th:if="${activeAllocation == null and pendingAllocation != null}" class="card card-custom p-4 mb-4 border-warning">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-hourglass-split text-warning fs-1 me-3"></i>
+                <div>
+                    <h5 class="fw-bold mb-1">Room Allocation Request Pending</h5>
+                    <p class="text-muted small mb-0">
+                        You requested <strong th:text="'Room ' + ${pendingAllocation.room.roomNumber}">Room A-102</strong> on
+                        <span th:text="${pendingAllocation.requestDate}">2026-10-01</span>.
+                        Please wait for the Hostel Warden to review and assign your bed.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario 3: Not Allocated & No Pending Request (Can apply) -->
+        <div th:if="${activeAllocation == null and pendingAllocation == null}">
+            <div class="card card-custom mb-4">
+                <div class="card-header">
+                    <i class="bi bi-search me-2 text-primary"></i> Apply for Room Allocation
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small mb-4">You do not currently have an active hostel bed. Browse available rooms below and submit an allocation request:</p>
+
+                    <form th:action="@{/student/room/request}" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="roomId" class="form-label">Select Available Room <span class="text-danger">*</span></label>
+                                <select class="form-select" name="roomId" id="roomId" required>
+                                    <option value="">-- Choose Available Room --</option>
+                                    <option th:each="r : ${availableRooms}" th:value="${r.id}"
+                                            th:text="'Room ' + ${r.roomNumber} + ' [' + ${r.roomType} + ' - ' + ${r.availableBeds} + ' beds available] - ₹' + ${r.rentPerMonth} + '/mo'">
+                                        Room A-101
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="remarks" class="form-label">Preferences / Remarks</label>
+                                <input type="text" class="form-control" name="remarks" id="remarks" placeholder="e.g. Prefer quiet corner / ground floor">
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">
+                                    <i class="bi bi-send-fill me-1"></i> Submit Allocation Request
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

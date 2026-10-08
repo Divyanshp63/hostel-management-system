@@ -19,8 +19,10 @@ import com.hostel.management.repository.LeaveRequestRepository;
 import com.hostel.management.repository.RoomAllocationRepository;
 import com.hostel.management.repository.StudentRepository;
 import com.hostel.management.repository.UserRepository;
+import com.hostel.management.service.AuditLogService;
 import com.hostel.management.service.LeaveService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,12 +38,14 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LeaveServiceImpl implements LeaveService {
 
     private final LeaveRequestRepository leaveRequestRepository;
     private final StudentRepository studentRepository;
     private final RoomAllocationRepository roomAllocationRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional
@@ -60,6 +64,17 @@ public class LeaveServiceImpl implements LeaveService {
                     ") cannot be after To date (" + request.getToDate() + ")");
         }
 
+        // Business Rule 2.1: Non-empty reason
+        if (request.getReason() == null || request.getReason().trim().isEmpty()) {
+            throw new BadRequestException("Leave reason cannot be empty");
+        }
+
+        // Business Rule 3: Check overlapping active/pending leaves
+        long overlapping = leaveRequestRepository.countOverlappingActiveLeaves(student.getId(), request.getFromDate(), request.getToDate());
+        if (overlapping > 0) {
+            throw new BadRequestException("You already have an active or pending leave pass covering these dates. Please review existing requests.");
+        }
+
         LeaveRequest leaveRequest = LeaveRequest.builder()
                 .student(student)
                 .leaveType(request.getLeaveType())
@@ -72,12 +87,19 @@ public class LeaveServiceImpl implements LeaveService {
                 .build();
 
         LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+        log.info("Leave request created for student {} (ID: {})", student.getUser().getName(), saved.getId());
         return mapToResponse(saved);
     }
 
     @Override
     @Transactional
     public LeaveResponse approveLeave(Long id, LeaveActionRequest request) {
+        return approveLeave(id, request, null);
+    }
+
+    @Override
+    @Transactional
+    public LeaveResponse approveLeave(Long id, LeaveActionRequest request, String wardenEmail) {
         LeaveRequest leave = leaveRequestRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Leave request not found with ID: " + id));
 
@@ -85,19 +107,45 @@ public class LeaveServiceImpl implements LeaveService {
             throw new BadRequestException("Only PENDING leave requests can be approved. Current status: " + leave.getStatus());
         }
 
+        User warden = null;
+        if (wardenEmail != null) {
+            warden = userRepository.findByEmail(wardenEmail.trim().toLowerCase()).orElse(null);
+        }
+
         leave.setStatus(LeaveStatus.APPROVED);
         leave.setApprovedOrRejectedAt(LocalDateTime.now());
-        if (request != null && request.getRemarks() != null) {
+        leave.setApprovedBy(warden);
+        if (request != null && request.getRemarks() != null && !request.getRemarks().isBlank()) {
             leave.setAdminRemarks(request.getRemarks().trim());
+        } else if (leave.getAdminRemarks() == null) {
+            leave.setAdminRemarks("Approved by Warden");
         }
 
         LeaveRequest updated = leaveRequestRepository.save(leave);
+
+        auditLogService.log(
+                warden != null ? warden.getId() : null,
+                warden != null ? warden.getName() : "Warden",
+                "WARDEN",
+                "LEAVE_APPROVED",
+                "LEAVE",
+                String.valueOf(leave.getId()),
+                "Leave approved for " + leave.getStudent().getUser().getName() + " (" + leave.getFromDate() + " to " + leave.getToDate() + ")"
+        );
+
+        log.info("Leave request #{} APPROVED by {}", id, warden != null ? warden.getEmail() : "system");
         return mapToResponse(updated);
     }
 
     @Override
     @Transactional
     public LeaveResponse rejectLeave(Long id, LeaveActionRequest request) {
+        return rejectLeave(id, request, null);
+    }
+
+    @Override
+    @Transactional
+    public LeaveResponse rejectLeave(Long id, LeaveActionRequest request, String wardenEmail) {
         LeaveRequest leave = leaveRequestRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Leave request not found with ID: " + id));
 
@@ -105,13 +153,33 @@ public class LeaveServiceImpl implements LeaveService {
             throw new BadRequestException("Only PENDING leave requests can be rejected. Current status: " + leave.getStatus());
         }
 
+        User warden = null;
+        if (wardenEmail != null) {
+            warden = userRepository.findByEmail(wardenEmail.trim().toLowerCase()).orElse(null);
+        }
+
         leave.setStatus(LeaveStatus.REJECTED);
         leave.setApprovedOrRejectedAt(LocalDateTime.now());
-        if (request != null && request.getRemarks() != null) {
+        leave.setApprovedBy(warden);
+        if (request != null && request.getRemarks() != null && !request.getRemarks().isBlank()) {
             leave.setAdminRemarks(request.getRemarks().trim());
+        } else {
+            leave.setAdminRemarks("Rejected by Warden");
         }
 
         LeaveRequest updated = leaveRequestRepository.save(leave);
+
+        auditLogService.log(
+                warden != null ? warden.getId() : null,
+                warden != null ? warden.getName() : "Warden",
+                "WARDEN",
+                "LEAVE_REJECTED",
+                "LEAVE",
+                String.valueOf(leave.getId()),
+                "Leave rejected for " + leave.getStudent().getUser().getName() + ". Reason: " + leave.getAdminRemarks()
+        );
+
+        log.info("Leave request #{} REJECTED by {}", id, warden != null ? warden.getEmail() : "system");
         return mapToResponse(updated);
     }
 
@@ -134,8 +202,9 @@ public class LeaveServiceImpl implements LeaveService {
             throw new BadRequestException("Only PENDING leave requests can be cancelled");
         }
 
-        leave.setStatus(LeaveStatus.REJECTED);
+        leave.setStatus(LeaveStatus.CANCELLED);
         leave.setAdminRemarks("Cancelled by resident student");
+        leave.setApprovedOrRejectedAt(LocalDateTime.now());
 
         LeaveRequest updated = leaveRequestRepository.save(leave);
         return mapToResponse(updated);

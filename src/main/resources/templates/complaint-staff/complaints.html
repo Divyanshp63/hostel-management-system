@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header('Maintenance Complaints')}">
+    <title>Maintenance Complaints - Smart PG &amp; Hostel</title>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('complaints')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Maintenance Department Complaints</h3>
+                <p class="text-muted small mb-0">Accept incoming tickets, track progress, add resolution details, and send for Warden verification</p>
+            </div>
+            <a th:href="@{/complaint-staff/dashboard}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-grid-1x2-fill me-1"></i> Dashboard View
+            </a>
+        </div>
+
+        <!-- Metric Badges -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge bg-secondary px-3 py-2">New: <strong th:text="${newComplaintsCount}">0</strong></span>
+            <span class="badge bg-warning text-dark px-3 py-2">In Progress: <strong th:text="${inProgressCount}">0</strong></span>
+            <span class="badge bg-info text-dark px-3 py-2">Resolved: <strong th:text="${resolvedCount}">0</strong></span>
+            <span class="badge bg-danger px-3 py-2">Returned: <strong th:text="${returnedCount}">0</strong></span>
+            <span class="badge bg-primary px-3 py-2">Total Active: <strong th:text="${totalActiveComplaints}">0</strong></span>
+        </div>
+
+        <!-- Complaints Table Card -->
+        <div class="card card-custom">
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-custom table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Student &amp; Location</th>
+                        <th>Category &amp; Issue Summary</th>
+                        <th>Priority &amp; SLA</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${complaints}">
+                        <td class="fw-bold" th:text="${c.complaintCode}">#CMP-0001</td>
+                        <td>
+                            <div class="fw-semibold text-dark" th:text="${c.studentName}">Student</div>
+                            <span class="badge bg-secondary-subtle text-secondary small" th:text="${c.roomNumber != null ? 'Room ' + c.roomNumber : 'General Area'}">Room</span>
+                            <div class="text-muted small" th:text="${c.studentPhone}">Phone</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border fw-semibold mb-1" th:text="${c.category}">ELECTRICAL</span>
+                            <div class="fw-bold text-dark" th:text="${c.title}">Title</div>
+                            <div class="text-muted small text-truncate" style="max-width: 260px;" th:text="${c.description}">Description</div>
+
+                            <div th:if="${c.status.name() == 'RETURNED' and c.effectiveVerificationRemarks != null}" class="alert alert-danger py-1 px-2 my-1 small">
+                                <strong><i class="bi bi-arrow-return-left me-1"></i>Warden Return Reason:</strong>
+                                <span th:text="${c.effectiveVerificationRemarks}">Re-check</span>
+                            </div>
+
+                            <div th:if="${c.effectiveResolutionDetails != null and c.status.name() != 'RETURNED'}" class="text-success small mt-1">
+                                <i class="bi bi-check2 me-1"></i><strong>Resolution:</strong> <span th:text="${c.effectiveResolutionDetails}">Fixed</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${c.priority.name() == 'CRITICAL' ? 'bg-danger text-white' : (c.priority.name() == 'HIGH' ? 'bg-warning text-dark' : 'bg-info text-dark')}"
+                                  th:text="${c.priority}">MEDIUM</span>
+                            <div th:if="${c.slaBreached}" class="mt-1">
+                                <span class="badge bg-danger text-white small"><i class="bi bi-alarm-fill me-1"></i>SLA BREACHED</span>
+                            </div>
+                            <div class="text-muted small mt-1" th:text="${#temporals.format(c.createdAt, 'dd-MMM HH:mm')}">Date</div>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${c.status.badgeClass}" th:text="${c.status.displayName}">
+                                SUBMITTED
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <!-- Details / History -->
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" th:data-bs-target="'#viewModal' + ${c.id}">
+                                    <i class="bi bi-eye"></i> Details
+                                </button>
+
+                                <!-- Accept Button for SUBMITTED -->
+                                <form th:if="${c.status.name() == 'SUBMITTED'}" th:action="@{/complaint-staff/complaints/accept/{id}(id=${c.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-play-fill me-1"></i> Accept
+                                    </button>
+                                </form>
+
+                                <!-- Restart Work Button for RETURNED -->
+                                <form th:if="${c.status.name() == 'RETURNED'}" th:action="@{/complaint-staff/complaints/accept/{id}(id=${c.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-warning btn-sm text-dark fw-semibold">
+                                        <i class="bi bi-arrow-repeat me-1"></i> Start Work
+                                    </button>
+                                </form>
+
+                                <!-- Work Notes Button for IN_PROGRESS -->
+                                <button th:if="${c.status.name() == 'IN_PROGRESS'}" type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" th:data-bs-target="'#notesModal' + ${c.id}">
+                                    <i class="bi bi-chat-left-text"></i> Update
+                                </button>
+
+                                <!-- Resolve Button for IN_PROGRESS -->
+                                <button th:if="${c.status.name() == 'IN_PROGRESS'}" type="button" class="btn btn-success btn-sm fw-semibold" data-bs-toggle="modal" th:data-bs-target="'#resolveModal' + ${c.id}">
+                                    <i class="bi bi-check-lg me-1"></i> Mark Resolved
+                                </button>
+                            </div>
+
+                            <!-- Notes Modal -->
+                            <div class="modal fade text-start" th:id="'notesModal' + ${c.id}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form th:action="@{/complaint-staff/complaints/notes/{id}(id=${c.id})}" method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title fw-bold"><i class="bi bi-journal-text me-2 text-primary"></i>Work Notes &amp; Updates</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Add update note for: <strong th:text="${c.title}">Title</strong></p>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-semibold small">Work Remark / Update Note</label>
+                                                    <textarea class="form-control" name="notes" rows="3" placeholder="Enter work notes..." required></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary btn-sm fw-semibold">Save Notes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Resolve Modal -->
+                            <div class="modal fade text-start" th:id="'resolveModal' + ${c.id}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form th:action="@{/complaint-staff/complaints/resolve/{id}(id=${c.id})}" method="post">
+                                            <div class="modal-header bg-success text-white">
+                                                <h5 class="modal-title fw-bold"><i class="bi bi-check2-circle me-2"></i>Mark Complaint as Resolved</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Resolve ticket <strong th:text="${c.complaintCode} + ' - ' + ${c.title}"></strong>?</p>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-semibold small">Resolution Details <span class="text-danger">*</span></label>
+                                                    <textarea class="form-control" name="resolutionRemarks" rows="3" placeholder="e.g. Fan capacitor replaced and fan tested successfully." required></textarea>
+                                                    <div class="form-text">Describe the repair action taken. This will be sent directly to the Warden for verification.</div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-success btn-sm fw-semibold">Send to Warden for Verification</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- View Details & History Modal -->
+                            <div class="modal fade text-start" th:id="'viewModal' + ${c.id}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title fw-bold text-dark"><i class="bi bi-info-circle me-2 text-primary"></i>Complaint Record: <span th:text="${c.complaintCode}"></span></h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="text-muted small">Status</label>
+                                                    <div>
+                                                        <span class="badge" th:classappend="${c.status.badgeClass}" th:text="${c.status.displayName}"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="text-muted small">Student</label>
+                                                    <div class="fw-bold text-dark" th:text="${c.studentName}">Name</div>
+                                                    <div class="small text-muted" th:text="'Room ' + ${c.roomNumber} + ' | Adm ' + ${c.studentAdmissionNumber}"></div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="text-muted small">Issue</label>
+                                                    <div class="fw-bold text-dark" th:text="${c.title}">Title</div>
+                                                    <div class="p-2 bg-light rounded text-muted small mt-1" th:text="${c.description}">Description</div>
+                                                </div>
+                                                <div class="col-12" th:if="${c.effectiveResolutionDetails != null}">
+                                                    <label class="text-muted small">Resolution Details</label>
+                                                    <div class="p-2 bg-light rounded border text-success small" th:text="${c.effectiveResolutionDetails}"></div>
+                                                </div>
+                                                <div class="col-12" th:if="${c.effectiveVerificationRemarks != null}">
+                                                    <label class="text-muted small">Warden Verification / Return Remarks</label>
+                                                    <div class="p-2 bg-light rounded border text-danger small" th:text="${c.effectiveVerificationRemarks}"></div>
+                                                </div>
+                                            </div>
+
+                                            <h6 class="fw-bold mt-4 mb-3 text-secondary"><i class="bi bi-clock-history me-1"></i>Complaint Audit Trail</h6>
+                                            <div class="timeline border-start border-2 border-primary-subtle ps-3 ms-2">
+                                                <div class="timeline-item mb-3" th:each="h : ${c.history}">
+                                                    <div class="fw-bold text-dark" th:text="${h.action}">Submitted</div>
+                                                    <div class="small text-muted">
+                                                        By: <strong th:text="${h.performedBy}">Student</strong> (<span th:text="${h.role}">STUDENT</span>) &bull;
+                                                        <span th:text="${#temporals.format(h.timestamp, 'dd-MM-yyyy HH:mm')}">Date</span>
+                                                    </div>
+                                                    <div th:if="${h.remarks != null and !h.remarks.isBlank()}" class="small text-secondary mt-1 p-2 bg-light rounded border" th:text="${h.remarks}">Remarks</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(complaints)}">
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-check2-circle fs-1 text-success d-block mb-2"></i>
+                            No complaints assigned to the Maintenance Department.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

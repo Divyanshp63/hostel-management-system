@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Outstanding / Pending Fees')}"></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="app-layout">
+    <div th:replace="~{fragments/sidebar :: sidebar('pending-fees')}"></div>
+
+    <main class="app-content">
+        <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h3 class="fw-bold mb-1">Outstanding Student Dues</h3>
+                <p class="text-muted mb-0">List of student invoices with unpaid balances requiring collection.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/accountant/fees}" class="btn btn-outline-secondary">
+                    <i class="bi bi-receipt me-1"></i> All Invoices
+                </a>
+                <a th:href="@{/accountant/payments/record}" class="btn btn-success">
+                    <i class="bi bi-cash me-1"></i> Record Payment
+                </a>
+            </div>
+        </div>
+
+        <!-- Summary Banner -->
+        <div class="card border-0 shadow-sm mb-4 bg-warning bg-opacity-10 border-start border-warning border-4">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <span class="text-warning-emphasis fw-bold text-uppercase small">Total Pending Receivables</span>
+                    <div class="display-6 fw-bold text-warning-emphasis" th:text="'₹' + ${#numbers.formatDecimal(totalPending, 1, 'COMMA', 2, 'POINT')}">₹0.00</div>
+                    <small class="text-muted">Total uncollected student hostel dues currently outstanding</small>
+                </div>
+                <div>
+                    <span class="badge bg-danger fs-6 px-3 py-2" th:text="${#lists.size(fees)} + ' Invoices Pending'">0 Invoices Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Invoices Table -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#ID</th>
+                                <th>Student</th>
+                                <th>Month</th>
+                                <th>Total Invoiced</th>
+                                <th>Paid</th>
+                                <th>Pending Balance</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="f : ${fees}">
+                                <td class="fw-semibold text-muted" th:text="'#' + ${f.id}">#1</td>
+                                <td>
+                                    <div class="fw-bold" th:text="${f.student.user.name}">Student Name</div>
+                                    <small class="text-muted" th:text="${f.student.admissionNumber}">ADM-001</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border" th:text="${f.month}">OCTOBER-2026</span>
+                                </td>
+                                <td class="fw-bold" th:text="'₹' + ${#numbers.formatDecimal(f.totalAmount, 1, 'COMMA', 2, 'POINT')}">₹9,500.00</td>
+                                <td class="fw-semibold text-success" th:text="'₹' + ${#numbers.formatDecimal(f.paidAmount, 1, 'COMMA', 2, 'POINT')}">₹5,000.00</td>
+                                <td class="fw-bold text-danger fs-6" th:text="'₹' + ${#numbers.formatDecimal(f.remainingAmount, 1, 'COMMA', 2, 'POINT')}">₹4,500.00</td>
+                                <td>
+                                    <span th:text="${#temporals.format(f.dueDate, 'dd-MM-yyyy')}">15-10-2026</span>
+                                    <span th:if="${f.dueDate.isBefore(T(java.time.LocalDate).now())}" class="badge bg-danger ms-1">Overdue</span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${f.status.name() == 'OVERDUE' ? 'bg-danger' : (f.status.name() == 'PARTIAL' ? 'bg-primary' : 'bg-warning text-dark')}"
+                                          th:text="${f.status}">PENDING</span>
+                                </td>
+                                <td class="text-end">
+                                    <a th:href="@{/accountant/payments/record(feeId=${f.id})}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-cash-stack me-1"></i> Collect
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(fees)}">
+                                <td colspan="9" class="text-center py-5 text-muted">
+                                    <i class="bi bi-check-circle fs-1 text-success d-block mb-2"></i>
+                                    Excellent! No outstanding dues. All fee invoices are fully paid.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
