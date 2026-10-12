@@ -2,6 +2,16 @@
 > **An Advanced Java Project Based Learning (PBL) Enterprise System**  
 > Developed using **Java 17**, **Spring Boot 3.3.4**, **Spring Security 6**, **JJWT 0.12.6**, **Spring Data JPA**, **MySQL 8.0**, and **React 18 (Vite + Bootstrap 5)**.
 
+Report Link :- https://drive.google.com/file/d/17WYoIa3ksWRfZmLH-M08g_v1BmQwC_4z/view?usp=drive_link
+
+Research paper Link :- https://docs.google.com/document/d/1I5YC9Oqi203Cx9tTzXrNuzu8Y-5fFUg9/edit?usp=drive_link&ouid=111531009659464011119&rtpof=true&sd=true
+
+PPT Link :- 
+https://docs.google.com/presentation/d/1iBLxBQINHmlURslvCkWwOFE0R-IFbX9d/edit?usp=drive_link&ouid=111531009659464011119&rtpof=true&sd=true
+
+Live Link :- 
+https://smart-hostel-management-9j3u.onrender.com/login
+
 ---
 
 ## 📌 Executive Summary
